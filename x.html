@@ -13,14 +13,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 현재 URL 가져오기
-            var currentURL = window.location.href;
-
-            // URL 파라미터 파싱
-            var urlParams = new URLSearchParams(currentURL);
-
-            // "q" 파라미터 값 가져오기
-            var qParam = urlParams.get('q');
+            const urlParams = new URL(location.href).searchParams;
+            const qParam = urlParams.get('q');
 
             // q 파라미터가 존재하면 값을 화면에 표시
             if (qParam !== null) {
