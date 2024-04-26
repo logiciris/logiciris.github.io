@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XSS Cookie site</title>
+    <title>XSS site</title>
 </head>
 <body>
     <!-- 값을 보여줄 div 요소 -->
@@ -24,10 +24,10 @@
             // 값을 보여줄 div 요소 가져오기
             var qValueElement = document.getElementById('qValue');
             // 값 설정
-            qValueElement.textContent = "q 파라미터의 값: " + qParam;
+            qValueElement.textContent = "사용자의 Cookie: " + qParam;
         } else {
             // q 파라미터가 존재하지 않을 때의 처리
-            console.log("q 파라미터가 존재하지 않습니다.");
+            console.log("사용자의 Cookie를 보내주세요.");
         }
     </script>
 </body>
