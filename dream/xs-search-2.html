@@ -5,7 +5,6 @@
 <script>
 const iframe = document.getElementById("iframe");
 iframe.src= "http://host3.dreamhack.games:17137/search?query=a";
-document.body.appendChild(iframe);
 iframe.onload = () => {console.log(iframe.contentWindow.frames.length);};
 </script>
 </html>
