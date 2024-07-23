@@ -1,10 +1,14 @@
 <html>
+
+<head>
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+</head>  
 <iframe id="iframe">
   
 </iframe>
 <script>
 const iframe = document.getElementById("iframe");
-iframe.src= "http://host3.dreamhack.games:17137/search?query=a";
+iframe.src= "https://host3.dreamhack.games:17137/search?query=a";
 iframe.onload = () => {console.log(iframe.contentWindow.frames.length);};
 </script>
 </html>
