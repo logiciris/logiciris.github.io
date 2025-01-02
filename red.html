@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSS site</title>
+</head>
+<body>
+    <!-- 값을 보여줄 div 요소 -->
+    <H1>XSS site</H1>
+    
+    <div id="qValue">공격자 사이트입니다.</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URL(location.href).searchParams;
+            const qParam = urlParams.get('q');
+            window.location.href = "https://www.google.com";
+            
+        });
+    </script>
+</body>
+</html>
