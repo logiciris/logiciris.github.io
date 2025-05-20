@@ -6,11 +6,11 @@ tags:
 
 ---
 
-# 1. 기초개념정리
+## 1. 기초 개념정리
 
 - **ECMA Script 명세서**에서 사용하는 주요 개념들에 대한 정리입니다. 괜찮으신 분들은 곧바로 "2. Prototype Pollution 이란?" 항목으로 이동하시면 되겠습니다만 처음 이신분들은 확인하시는걸 추천드립니다.
 
-## 01. javascript 에서 내부 메서드(Internal Method)와 내부 슬롯(Internal Slot)이란?
+### 01. javascript 에서 내부 메서드(Internal Method)와 내부 슬롯(Internal Slot)이란?
 
 - 내부 메서드와 내부 슬롯은 javascript 코드 안에서는 등장하지 않고 javascript 엔진의 구현과 동작을 설명하기 위해 **ECMA Script 명세서에서 사용하는 개념**입니다.
 
@@ -24,7 +24,7 @@ tags:
   - 상속되지 않으며 JS코드로 직접 접근은 불가합니다.
   - `[[Prototype]]` 과 같은 형식으로 표기합니다.
 
-## 02. `[[Prototype]]` 과 Object.prototype 이란?
+### 02. `[[Prototype]]` 과 Object.prototype 이란?
 
 #### `[[Prototype]]`
 
@@ -43,14 +43,14 @@ tags:
 - ECMAScript 명세에서는 Realm을 다음과 같이 정의합니다:
   - 개념적으로, Realm은 내재 객체의 집합, ECMAScript 전역 환경, 해당 전역 환경의 범위 내에서 로드된 모든 ECMAScript 코드, 그리고 기타 관련 상태 및 자원으로 구성된다.
 
-# 2. Prototype Pollution 이란 ?
+## 2. Prototype Pollution 이란 ?
 
 - 공격자가 **전역 객체의 프로토타입(Object.prototype)** 에 의도적으로 속성을 주입(변조)함으로써, 해당 프로토타입을 상속받는 **모든 객체에 악성 속성이 전파되는** 보안 취약점입니다.
 - javascript에서는 객체가 속성을 갖고 있지 않으면 Prototype 체인을 따라 상위 객체에서 속성을탐색하는 방식으로 동작하므로, 최상위 객체인 Object.prototype의 속성에 악의적인 값을 삽입하게되면 모든 객체가 악의적인 값에 접근 할 수 있게됩니다.
 
-# 3. Prototype Pollution 취약점 코드
+## 3. Prototype Pollution 취약점 코드
 
-## 클라이언트 측 취약 코드
+### 클라이언트 측 취약 코드
 
 - 브라우저 콘솔에서 테스트 가능합니다.
 
@@ -66,7 +66,7 @@ if (User.isAdmin) {
 }
 ```
 
-## 서버 측 취약 코드
+### 서버 측 취약 코드
 
 - 코드입니다.
 
@@ -108,9 +108,9 @@ Content-Type: application/json
 }
 ```
 
-# 4. Prototype Pollution취약 여부 분석 방법
+## 4. Prototype Pollution취약 여부 분석 방법
 
-## 클라이언트 측 분석 방법
+### 클라이언트 측 분석 방법
 
 - (Finding client-side prototype pollution gadgets manually)
 - yourTestKey 에 의심이 가는 속성 값을 설정합니다.
@@ -125,7 +125,7 @@ Object.defineProperty(Object.prototype, "yourTestKey", {
 });
 ```
 
-## 서버 측 분석 방법
+### 서버 측 분석 방법
 
 #### 01. JSON 무작위 삽입
 
@@ -349,9 +349,9 @@ function _addHeaderLine(field, value, dest) {
 }
 ```
 
-# 5. 우회방안
+## 5. 우회방안
 
-#### `__proto__` 필터링 되어있을 경우
+### `__proto__` 필터링 되어있을 경우
 
 1. `constructor` 사용하여 우회
    - `myObject.constructor.prototype` 이것은 `myObject.__proto__` 이것과 동일합니다.
@@ -370,7 +370,7 @@ vulnerable-website.com/?__proto__.gadget=payload
 vulnerable-website.com/?__pro__proto__to__.gadget=payload
 ```
 
-# 9. 참고
+## 참고
 
 - https://tc39.es/ecma262/#sec-object-internal-methods-and-internal-slots
 - https://portswigger.net/web-security/prototype-pollution
