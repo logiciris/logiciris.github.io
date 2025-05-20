@@ -1,6 +1,6 @@
 ---
 date: 2025-05-02T16:08:00
-modified: 2025-05-02T16:08:00
+modified: 2025-05-20T21:08:00
 tags:
 ---
 
@@ -112,10 +112,8 @@ Content-Type: application/json
 
 ### 클라이언트 측 분석 방법
 
-- (Finding client-side prototype pollution gadgets manually)
-- yourTestKey 에 의심이 가는 속성 값을 설정합니다.
-- 이후 사이트에서 버튼 클릭등 동작을 수행하며 콘솔에 trace 로그가 남는 여부를 확인합니다.
-
+- 아래 코드의 `yourTestKey` 에 의심이 가는 속성 값을 설정 후 브라우저 콘솔창에 코드를 입력합니다. 
+- 이후 사이트에서 버튼 클릭 등 동작을 수행하며 콘솔에 trace 로그가 남는 여부를 확인합니다. 로그가 남는다면 해당 속성이 Prototype Pollution에 취약할 것으로 추측할 수 있습니다. 
 ```js
 Object.defineProperty(Object.prototype, "yourTestKey", {
   get() {
@@ -133,7 +131,7 @@ Object.defineProperty(Object.prototype, "yourTestKey", {
 - 오염 페이로드 전송 (Prototype Pollution Payload)을 시도합니다.
 
 ```http
-POST /api/profile/update
+POST /api/profile/update HTTP/1.1
 Content-Type: application/json
 
 {
@@ -143,7 +141,7 @@ Content-Type: application/json
 }
 ```
 
-```http
+```json
 {
   "settings": {
     "__proto__": {
@@ -156,7 +154,7 @@ Content-Type: application/json
 - 이후 admin 권한 만 접근 가능한 페이지등에 접근을 시도해봅니다.
 
 ```http
-GET /dashboard
+GET /dashboard HTTP/1.1
 → 응답: "Welcome, Admin"  ← 오염 성공!
 ```
 
@@ -362,7 +360,7 @@ myObject.constructor.prototype;
 
 2. 단순 문자열 제거 시 우회
 
-```http
+```text
 // 기존
 vulnerable-website.com/?__proto__.gadget=payload
 
