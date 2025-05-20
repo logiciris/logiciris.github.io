@@ -396,7 +396,6 @@ vulnerable-website.com/?__pro__proto__to__.gadget=payload
 - https://portswigger.net/web-security/prototype-pollution
 - https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Advanced_JavaScript_objects/Object_prototypes
 - https://tc39.es/ecma262/#sec-ordinary-and-exotic-objects-behaviours
-- https://portswigger.net/web-security/prototype-pollution
 - https://github.com/expressjs/body-parser
 - https://github.com/nodejs/node/blob/main/lib/_http_incoming.js
 - https://nodejs.org/api/http.html?utm_source=chatgpt.com
