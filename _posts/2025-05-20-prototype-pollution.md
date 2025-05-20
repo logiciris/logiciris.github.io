@@ -12,7 +12,7 @@ layout: post
 
 - **ECMA Script 명세서**에서 사용하는 주요 개념들에 대한 정리입니다. 괜찮으신 분들은 곧바로 "2. Prototype Pollution 이란?" 항목으로 이동하시면 되겠습니다만 처음 이신분들은 확인하시는걸 추천드립니다.
 
-### 01. javascript 에서 내부 메서드(Internal Method)와 내부 슬롯(Internal Slot)이란?
+### 01. javascript 에서 내부 메서드(Internal Method) 와 내부 슬롯(Internal Slot)이란?
 
 - 내부 메서드와 내부 슬롯은 javascript 코드 안에서는 등장하지 않고 javascript 엔진의 구현과 동작을 설명하기 위해 **ECMA Script 명세서에서 사용하는 개념**입니다.
 
@@ -110,7 +110,7 @@ Content-Type: application/json
 }
 ```
 
-## 4. Prototype Pollution취약 여부 분석 방법
+## 4. Prototype Pollution 취약 여부 분석 방법
 
 ### 클라이언트 측 분석 방법
 
@@ -378,7 +378,7 @@ Authorization: Bearer legit-user-token
 myObject.constructor.prototype;
 ```
 
-2. 단순 문자열 제거 시 우회
+2. 단순 문자열 제거 시 우회
 
 ```text
 
