@@ -334,8 +334,7 @@ read(req, res, next, parse, debug, {
 
 ##### Node
 
-- Object.prototype에 해당 헤더 속성이 오염되어 있으면, `dest[field] === undefined` 조건은 false가 되어 실제 요청 헤더가 무시되고, **공격자가 삽입한 오염된 속성값이 우선 적용되는 결과**가 발생합니다.
-
+- Object.prototype에 헤더 속성이 오염되어 있으면, `dest[field] === undefined` 조건은 false가 되어 실제 요청 헤더가 무시되고, **공격자가 삽입한 오염된 속성값이 우선 적용되는 결과**가 발생합니다.
 ```js
 IncomingMessage.prototype._addHeaderLine = _addHeaderLine;
 function _addHeaderLine(field, value, dest) {
@@ -346,6 +345,22 @@ function _addHeaderLine(field, value, dest) {
     }
 }
 ```
+
+- 서버가 `req.headers['authorization']`을 읽으려 할 때, 실제 헤더가 무시되고 오염된 Bearer attacker_token이 적용되게됩니다. 
+```http
+POST /api/some-endpoint HTTP/1.1
+Host: logiciris.com
+Content-Type: application/json
+Authorization: Bearer legit-user-token
+
+{
+  "__proto__": {
+    "authorization": "Bearer attacker-token"
+  }
+}
+```
+
+- 위와같은 방식으로 다른 모든 헤더에도 적용이 가능합니다. 
 
 ## 5. 우회방안
 
