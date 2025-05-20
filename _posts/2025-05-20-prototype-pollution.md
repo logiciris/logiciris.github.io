@@ -347,6 +347,7 @@ function _addHeaderLine(field, value, dest) {
 ```
 
 - 서버가 `req.headers['authorization']`을 읽으려 할 때, 실제 헤더가 무시되고 오염된 Bearer attacker_token이 적용되게됩니다. 
+
 ```http
 POST /api/some-endpoint HTTP/1.1
 Host: logiciris.com
@@ -374,7 +375,6 @@ myObject.constructor.prototype;
 ```
 
 2. 단순 문자열 제거 시 우회
-
 ```text
 // 기존
 vulnerable-website.com/?__proto__.gadget=payload
