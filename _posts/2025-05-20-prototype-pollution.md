@@ -1,7 +1,9 @@
 ---
-date: 2025-05-02T16:08:00
-modified: 2025-05-20T21:08:00
-tags:
+title: "Prototype Pollution 취약점 분석"
+date: 2025-05-20
+categories: [Vuln Analysis]
+tags: [javascript, prototype pollution]
+layout: post
 ---
 
 ---
@@ -112,8 +114,9 @@ Content-Type: application/json
 
 ### 클라이언트 측 분석 방법
 
-- 아래 코드의 `yourTestKey` 에 의심이 가는 속성 값을 설정 후 브라우저 콘솔창에 코드를 입력합니다. 
-- 이후 사이트에서 버튼 클릭 등 동작을 수행하며 콘솔에 trace 로그가 남는 여부를 확인합니다. 로그가 남는다면 해당 속성이 Prototype Pollution에 취약할 것으로 추측할 수 있습니다. 
+- 아래 코드의 `yourTestKey` 에 의심이 가는 속성 값을 설정 후 브라우저 콘솔창에 코드를 입력합니다.
+- 이후 사이트에서 버튼 클릭 등 동작을 수행하며 콘솔에 trace 로그가 남는 여부를 확인합니다. 로그가 남는다면 해당 속성이 Prototype Pollution에 취약할 것으로 추측할 수 있습니다.
+
 ```js
 Object.defineProperty(Object.prototype, "yourTestKey", {
   get() {
@@ -335,6 +338,7 @@ read(req, res, next, parse, debug, {
 ##### Node
 
 - Object.prototype에 헤더 속성이 오염되어 있으면, `dest[field] === undefined` 조건은 false가 되어 실제 요청 헤더가 무시되고, **공격자가 삽입한 오염된 속성값이 우선 적용되는 결과**가 발생합니다.
+
 ```js
 IncomingMessage.prototype._addHeaderLine = _addHeaderLine;
 function _addHeaderLine(field, value, dest) {
@@ -346,7 +350,7 @@ function _addHeaderLine(field, value, dest) {
 }
 ```
 
-- 서버가 `req.headers['authorization']`을 읽으려 할 때, 실제 헤더가 무시되고 오염된 Bearer attacker_token이 적용되게됩니다. 
+- 서버가 `req.headers['authorization']`을 읽으려 할 때, 실제 헤더가 무시되고 오염된 Bearer attacker_token이 적용되게됩니다.
 
 ```http
 POST /api/some-endpoint HTTP/1.1
@@ -361,7 +365,7 @@ Authorization: Bearer legit-user-token
 }
 ```
 
-- 위와같은 방식으로 다른 모든 헤더에도 적용이 가능합니다. 
+- 위와같은 방식으로 다른 모든 헤더에도 적용이 가능합니다.
 
 ## 5. 우회방안
 
@@ -375,12 +379,15 @@ myObject.constructor.prototype;
 ```
 
 2. 단순 문자열 제거 시 우회
+
 ```text
+
 // 기존
 vulnerable-website.com/?__proto__.gadget=payload
 
 // 우회
 vulnerable-website.com/?__pro__proto__to__.gadget=payload
+
 ```
 
 ## 참고
