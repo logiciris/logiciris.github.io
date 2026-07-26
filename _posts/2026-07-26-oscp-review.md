@@ -3,7 +3,7 @@ title: "2026년 OSCP 합격 후기 및 학습 방법 (CIS 부트캠프를 곁들
 date: 2026-07-26 20:00:00 +0900
 categories: [Certification]
 tags: [OSCP, OffSec, 자격증후기, 침투테스트, CIS 부트캠프]
-description: "OSCP를 준비하면서 경험한 공부 과정과 시험 후기를 정리합니다."
+description: "OSCP를 준비하면서 경험한 공부 과정과 시험 후기를 정리했습니다."
 ---
 
 
@@ -15,14 +15,16 @@ description: "OSCP를 준비하면서 경험한 공부 과정과 시험 후기�
 
 OSCP 자격증 취득 후기에 앞서 먼저 간단히 자격증에 대해 설명드리겠습니다.
 
-*OSCP(OffSec Certified Professional)란?
+> **OSCP(OffSec Certified Professional)란?**
 OffSec Certified Professional(OSCP+ 및 OSCP) 자격증은
-사이버 보안 전문가가 윤리적 해킹 및 침투 테스트 분야의 실무 능력을 검증받는 시험입니다.*
+사이버 보안 전문가가 윤리적 해킹 및 침투 테스트 분야의 실무 능력을 검증받는 시험입니다.
+>
 
 즉 해당 자격증을 취득한 사람은 OffSec이 공인하는 보안 전문가라고 보면 되겠습니다.
 
-*Offsec은 어떤 곳인가요?
-해킹 전용 운영체제인 Kali Linux를 개발한 곳이며, 세계 최대 규모의 취약점 데이터베이스인 Exploit-db를 운영하는 곳입니다.*
+> **Offsec은 어떤 곳인가요?**
+해킹 전용 운영체제인 Kali Linux를 개발한 곳이며, 세계 최대 규모의 취약점 데이터베이스인 Exploit-db를 운영하는 곳입니다.
+>
 
 시험 구조에 대해서 설명드리겠습니다. 
 
