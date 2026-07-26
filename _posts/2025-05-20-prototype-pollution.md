@@ -3,7 +3,6 @@ title: "Prototype Pollution 취약점 분석"
 date: 2025-05-20
 categories: [Vuln Analysis]
 tags: [javascript, prototype pollution]
-layout: post
 ---
 
 ---
