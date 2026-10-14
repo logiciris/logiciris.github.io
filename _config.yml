@@ -53,6 +53,7 @@ defaults:
       type: notes
     values:
       layout: post
+      render_with_liquid: false
       toc: true
   - scope:
       path: ""
