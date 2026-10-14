@@ -2,132 +2,63 @@
 title: "서버 사이드 템플릿 인젝션 (SSTI)"
 date: 2026-10-15 09:00:00 +0900
 categories: [Web Security, SSTI]
-tags: [ssti, template-injection, jinja2, flask, web]
-description: "사용자 입력이 템플릿 코드로 해석되는 SSTI의 원리와 렌더 함수·문자열 포맷 혼용 실수, 데이터와 템플릿을 분리하는 방어를 정리합니다."
+tags: [ssti, template-injection, jinja2, web]
+description: "사용자 입력이 템플릿 문자열 자체에 섞여 서버에서 표현식으로 평가되는 SSTI의 개념과, 엔진 탐지·식별·컨텍스트 접근 구문을 정리합니다."
 mermaid: true
 ---
 
-> 템플릿 엔진은 `{{ ... }}` 안을 **코드처럼 평가**합니다. 사용자 입력이 템플릿 "데이터"가 아니라 템플릿 "문자열 자체"에 섞이면, 사용자는 서버 안에서 표현식을 실행하게 됩니다. 이것이 SSTI입니다.
+> 템플릿 엔진은 `{{ ... }}` 안을 **코드처럼 평가**한다. 사용자 입력이 템플릿 "데이터"가 아니라 템플릿 "문자열 자체"에 섞이면, 사용자는 서버 안에서 표현식을 실행하게 된다. 이것이 SSTI다.
 
-## 원리: 데이터가 템플릿 문법에 섞일 때
+## 개념
 
-안전한 사용은 템플릿은 고정, 사용자 값은 변수로 넘기는 것입니다. 취약한 사용은 사용자 값을 **템플릿 문자열을 만드는 재료**로 쓰는 것입니다.
-
-```mermaid
-flowchart LR
-    subgraph SAFE["안전"]
-      T1["고정 템플릿"] --> R1["렌더링"]
-      V1["사용자 값 name"] --> R1
-    end
-    subgraph BAD["취약"]
-      U["사용자 입력"] --> C["문자열 조립"]
-      C --> R2["렌더링"]
-      R2 --> X["서버가 평가"]
-    end
-```
-
-XSS와 비교하면 영향 범위가 다릅니다.
-
-| 구분 | XSS | SSTI |
-|---|---|---|
-| 해석 주체 | 사용자 브라우저 | 서버 |
-| 영향 | 해당 사용자 세션 | 서버 설정값, 객체, 경우에 따라 코드 실행 |
-| 원인 | 출력 인코딩 부재 | 입력이 템플릿 문법으로 해석됨 |
-
-## 취약한 코드 → 고친 코드
-
-취약한 예시입니다(직접 만든 최소 Flask 예제).
+안전한 사용은 템플릿은 고정, 사용자 값은 변수로 넘기는 것이다. 취약한 사용은 사용자 값을 **템플릿 문자열을 만드는 재료**로 쓰는 것이다.
 
 ```python
-# vulnerable.py
-from flask import Flask, request, render_template_string
-
-app = Flask(__name__)
-
 @app.get("/hello")
 def hello():
     name = request.args.get("name", "guest")
-    page = f"<h1>Hello {name}</h1>"        # 입력이 템플릿 문자열에 들어감
-    return render_template_string(page)    # 이 문자열이 템플릿으로 해석됨
-
-@app.errorhandler(404)
-def not_found(e):
-    # 요청 경로를 템플릿에 붙이는 실수도 같은 종류
-    return render_template_string("<p>Not found: " + request.path + "</p>"), 404
+    page = f"<h1>Hello {name}</h1>"      # 입력이 템플릿 문자열에 들어감
+    return render_template_string(page)  # 이 문자열이 템플릿으로 해석됨
 ```
 
-- `{{ 7*7 }}`처럼 평가되는 입력을 넣으면 `49`가 출력되고, 이것이 SSTI의 가장 단순한 징후입니다.
-- 템플릿 컨텍스트에서 설정 객체(`config`)나 내부 객체에 닿을 수 있으면 비밀키 같은 값이 노출됩니다.
+`{{ 7*7 }}`을 넣어 `49`가 나오면 SSTI의 가장 단순한 징후다. 같은 사고가 `f-string`·`%`·`+`·`.format()` 어디서든 난다. XSS가 사용자 브라우저에서 해석되는 것과 달리 SSTI는 **서버**에서 평가되므로, 설정 객체(`config`)·내부 객체 접근, 경우에 따라 코드 실행까지 영향이 크다. 입력창뿐 아니라 404 경로, 오류 메시지, 이메일·알림 문구처럼 "서버가 문구를 만들어 주는 곳"에서 자주 나온다.
 
-고친 코드입니다.
+## 공격·우회 구문
 
-```python
-# fixed.py
-from flask import Flask, request, render_template_string
+영향 증명은 무해한 산술식으로 충분하다. 임의 코드 실행 시도는 허가 범위에서만 한다.
 
-app = Flask(__name__)
+### 탐지 — 엔진별 구분자로 산술식
 
-HELLO = "<h1>Hello {{ name }}</h1>"       # 템플릿은 상수
+계산 결과가 출력되면 템플릿으로 평가되는 것이다.
 
-@app.get("/hello")
-def hello():
-    name = request.args.get("name", "guest")
-    return render_template_string(HELLO, name=name)   # 값은 변수로 전달
-
-@app.errorhandler(404)
-def not_found(e):
-    return render_template_string("<p>Not found: {{ p }}</p>", p=request.path), 404
+```
+{{7*7}}        → 49   (Jinja2, Twig)
+${7*7}         → 49   (FreeMarker, JSP EL, Thymeleaf)
+#{7*7}         → 49   (Ruby ERB 일부, JSF)
+<%= 7*7 %>     → 49   (ERB, EJS)
+{7*7}          → 49   (일부 엔진)
 ```
 
-> **실무 포인트** 같은 사고가 `f-string`, `%` 포맷, `+` 연결, `.format()` 어디서든 납니다. "검증 정규식에서 `{}`를 막았다"는 방어도 믿지 마세요. 템플릿 문자열을 만드는 순간에 이미 입력이 섞여 있다는 사실이 문제입니다.
+### 엔진 식별 (구분자 반응 차이)
 
-## 확인 방법(진단 순서)
+```
+{{7*'7'}}  → 7777777 (Jinja2)  /  49 (Twig)
+${7*7} 는 되고 {{7*7}} 는 안 되면 → FreeMarker/EL 계열
+문법 오류 입력에 나오는 스택 트레이스·오류 문구로 좁힘
+```
 
-1. **입력 위치 찾기**: 응답에 그대로 반영되는 값(검색어, 이름, 경로, 오류 메시지, 헤더, 쿠키)을 모읍니다.
-2. **무해한 산술 식 넣기**: 엔진별 구분자(`{{ }}`, `${ }`, `<%= %>` 등)로 단순 계산식을 넣고 → **계산 결과가 출력되면** 템플릿으로 평가되는 것입니다. 이 단계의 확인으로 충분합니다.
-3. **엔진 추정**: 구분자별 반응 차이(어떤 구분자만 평가되는지, 오류 메시지 형식)로 엔진을 좁힙니다.
-4. **오류 응답 관찰**: 문법 오류 입력에 템플릿 엔진의 스택 트레이스나 오류 문구가 나오면 입력이 템플릿에 섞인다는 증거입니다.
-5. **영향 범위 보고**: 설정값 노출 가능 여부 정도까지만 확인하고, 임의 코드 실행 시도는 허가 범위 안에서만 합니다.
+### 컨텍스트 접근 (Jinja2 예)
 
-> **실무 포인트** 입력창에서만 찾지 마세요. 404 페이지의 경로, 에러 메시지, 이메일 본문 템플릿, 사용자 이름이 들어가는 알림 문구처럼 "서버가 문구를 만들어 주는 곳"에서 자주 나옵니다.
+설정값·내부 객체 노출 가능 여부까지만 확인한다.
 
-## 유형·변형
-
-| 유형 | 원리 | 확인 포인트 |
-|---|---|---|
-| 렌더 함수에 문자열 전달 | `render_template_string` 등에 조립한 문자열 | 템플릿 인자에 입력이 들어가는가 |
-| 포맷 문자열 혼용 | f-string 등으로 만든 뒤 템플릿으로 렌더링 | 조립 후 렌더 여부 |
-| 뷰 이름·경로 해석 | 프레임워크가 뷰 이름을 표현식으로 파싱 | 사용자 값이 뷰 이름에 들어가는가 |
-| 컨텍스트 과다 노출 | 설정 객체 등이 템플릿에서 접근 가능 | 템플릿 컨텍스트 변수 목록 |
-
-> **XSS와 겹치는 지점(SSTI 아님)** 자동 이스케이프를 끄는 `|safe` 같은 예외는 출력 인코딩을 건너뛰는 **XSS** 문제입니다. 템플릿 문자열이 서버에서 해석되는 SSTI와는 원인이 다르니 보고서에서 섞지 마세요.
-
-## 대응 방안
-
-### 코드 수준
-- **템플릿은 상수, 사용자 값은 변수**로 분리합니다. 파일 템플릿(`render_template`)을 우선 씁니다.
-- 사용자가 템플릿을 편집해야 하는 기능이라면 샌드박스 환경(예: Jinja2 `SandboxedEnvironment`)과 허용된 변수만 노출하는 컨텍스트를 씁니다. 샌드박스는 완전한 보증이 아니므로 보조 수단입니다.
-- 템플릿 컨텍스트에서 `config` 등 민감 객체를 노출하지 않습니다.
-
-### 설정 수준
-- 자동 이스케이프는 XSS 방어이지 SSTI 방어가 아닙니다. SSTI는 **템플릿 문자열 자체가 서버에서 해석되는 문제**라서 값을 이스케이프해도 이미 늦습니다. 설정으로 막으려 하지 말고 코드 수준의 분리(사용자 입력을 템플릿 소스로 쓰지 않기)가 본질적인 방어입니다.
-- 샌드박스 환경은 노출 범위를 줄일 뿐 우회 사례가 계속 보고되므로 "막혔다"는 근거로 삼지 않습니다.
-- 비밀키, 자격 증명을 코드/설정 객체에 두지 않고 비밀 관리 도구로 주입해, 노출되더라도 피해를 줄입니다.
-- 앱 프로세스를 최소 권한 계정, 컨테이너 격리로 실행합니다.
-
-### 구조 수준
-- 코드 리뷰와 정적 분석으로 `render_template_string`, 문자열 조립 후 렌더 패턴을 검사합니다.
-- 사용자 편집 템플릿(메일 양식 등)은 별도 샌드박스 서비스나 로직 없는 치환 방식(변수 치환만 지원)으로 제공합니다.
-
-## 함께 보기
-
-- [OS 커맨드 인젝션](/notes/os-command-injection/)
-- [SQL 인젝션](/notes/sql-injection/)
+```
+{{ config }}
+{{ config.items() }}
+{{ self.__init__.__globals__ }}
+```
 
 ## 참고 자료
 
 - [OWASP WSTG: Testing for Server-side Template Injection](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/18-Testing_for_Server-side_Template_Injection)
 - [CWE-1336: Improper Neutralization of Special Elements Used in a Template Engine](https://cwe.mitre.org/data/definitions/1336.html)
 - [Jinja 공식 문서: Sandbox](https://jinja.palletsprojects.com/en/stable/sandbox/)
-- [Flask 공식 문서: Templates](https://flask.palletsprojects.com/en/stable/templating/)
-- [OWASP Top 10 2021: A03 Injection](https://owasp.org/Top10/A03_2021-Injection/)
