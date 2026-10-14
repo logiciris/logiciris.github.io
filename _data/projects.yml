@@ -1,4 +1,6 @@
 - name: Windows-Offensive-Research
   url: https://github.com/logiciris/Windows-Offensive-Research
-  description: ""
-  language: ""
+  description: "Windows 공격 기법 연구 노트 모음. 현재 프로세스 기초 문서부터 정리 중입니다."
+  language: "Markdown"
+  icon: "W"
+  stars: 0

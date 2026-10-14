@@ -5,8 +5,11 @@
     var pre = document.createElement('pre');
     pre.className = 'mermaid';
     pre.textContent = src;
+    var box = document.createElement('div');
+    box.className = 'mermaid-box';
+    box.appendChild(pre);
     var target = el.tagName === 'CODE' ? el.parentNode : el;
-    target.parentNode.replaceChild(pre, target);
+    target.parentNode.replaceChild(box, target);
   });
   if (!window.mermaid) return;
   mermaid.initialize({

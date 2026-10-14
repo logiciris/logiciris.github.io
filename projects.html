@@ -8,10 +8,10 @@ permalink: /projects/
   {% for p in site.data.projects %}
   <li class="card">
     <a href="{{ p.url }}" rel="noopener">
-      <span class="card-icon">{% include logo.html size=22 %}</span>
+      <span class="card-icon" aria-hidden="true">{{ p.icon | default: p.name | slice: 0, 1 }}</span>
       <span class="card-name">{{ p.name }}</span>
       {% if p.description != "" %}<span class="card-desc">{{ p.description }}</span>{% endif %}
-      <span class="card-meta">{% if p.language != "" %}<span class="badge">{{ p.language }}</span>{% endif %}<span class="card-host">github.com</span></span>
+      <span class="card-meta">{% if p.language != "" %}<span class="badge">{{ p.language }}</span>{% endif %}{% if p.stars and p.stars > 0 %}<span class="card-stars">★ {{ p.stars }}</span>{% endif %}<span class="card-host">github.com</span></span>
     </a>
   </li>
   {% endfor %}

@@ -96,12 +96,18 @@
       var m = document.createElement('span'); m.className = 'r-meta'; m.textContent = d.kind + (d.category ? ' · ' + d.category : '');
       a.appendChild(t); a.appendChild(m); li.appendChild(a); list.appendChild(li);
     });
+    if (items.length) select(0);
+  }
+  function select(i) {
+    var as = list.querySelectorAll('a');
+    if (!as.length) return;
+    sel = i;
+    as.forEach(function (a, j) { a.setAttribute('aria-selected', j === sel ? 'true' : 'false'); });
   }
   function move(n) {
     var as = list.querySelectorAll('a');
     if (!as.length) return;
-    sel = (sel + n + as.length) % as.length;
-    as.forEach(function (a, i) { a.setAttribute('aria-selected', i === sel ? 'true' : 'false'); });
+    select((sel + n + as.length) % as.length);
     as[sel].scrollIntoView({ block: 'nearest' });
   }
   document.querySelectorAll('[data-search-open]').forEach(function (b) { b.addEventListener('click', open); });

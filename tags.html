@@ -4,14 +4,18 @@ title: Tags
 permalink: /tags/
 ---
 {% assign all = site.posts | concat: site.notes | sort: "date" | reverse %}
-{% assign tags = all | map: "tags" | join: "," | split: "," | uniq | sort %}
+{% assign names = all | map: "tags" | join: "," | split: "," | uniq %}
+{% assign keys = "" | split: "" %}
+{% for t in names %}{% assign c = all | where_exp: "d", "d.tags contains t" %}{% assign n = 1000 | minus: c.size %}{% assign key = n | append: "|" | append: t %}{% assign keys = keys | push: key %}{% endfor %}
+{% assign keys = keys | sort_natural %}
 <p class="tag-cloud">
-  {% for t in tags %}{% assign c = all | where_exp: "d", "d.tags contains t" %}<a class="tag-chip" href="#{{ t | slugify }}">#{{ t }} <span>{{ c.size }}</span></a>{% endfor %}
+  {% for k in keys %}{% assign t = k | split: "|" | last %}{% assign c = all | where_exp: "d", "d.tags contains t" %}<a class="tag-chip" href="#{{ t | slugify }}">#{{ t }} <span>{{ c.size }}</span></a>{% endfor %}
 </p>
-{% for t in tags %}
+{% for k in keys %}
+{% assign t = k | split: "|" | last %}
 {% assign c = all | where_exp: "d", "d.tags contains t" %}
 <section class="year-group" id="{{ t | slugify }}">
-  <h2 class="group-title">#{{ t }}</h2>
+  <h2 class="group-title">#{{ t }} <span class="group-count">{{ c.size }}</span></h2>
   <ul class="entry-list">
     {% for d in c %}<li><a href="{{ d.url | relative_url }}"><span class="entry-title">{{ d.title }}</span><span class="entry-date">{% if d.collection == 'notes' %}Notes{% else %}Posts{% endif %}</span></a></li>{% endfor %}
   </ul>
