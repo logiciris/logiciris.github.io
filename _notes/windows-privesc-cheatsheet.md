@@ -101,7 +101,7 @@ pypykatz lsa minidump lsass.dmp
 
 ## 함께 보기
 
-- [윈도우 권한 상승(개념)](/notes/windows-privilege-escalation/)
+- [윈도우 권한 상승](/notes/windows-privilege-escalation/)
 - [Active Directory 공격 도구 치트시트](/notes/active-directory-cheatsheet/)
 - [모의침투 작전 흐름](/notes/penetration-testing-operation-flow/)
 

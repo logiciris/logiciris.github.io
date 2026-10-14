@@ -92,9 +92,9 @@ snmpwalk -v2c -c public $TARGET 1.3.6.1.2.1.6.13.1.3
 
 ## 함께 보기
 
-- [수동·능동 정찰의 경계](/notes/reconnaissance-passive-active/)
-- [포트·서비스 스캐닝의 원리](/notes/port-and-service-scanning/)
-- [서비스 열거: 포트 너머의 정보 캐기](/notes/network-service-enumeration/)
+- [정보 수집: 수동·능동 정찰](/notes/reconnaissance-passive-active/)
+- [포트·서비스 스캐닝](/notes/port-and-service-scanning/)
+- [네트워크 서비스 열거 (FTP·SSH·SMB·SMTP)](/notes/network-service-enumeration/)
 
 ## 참고 자료
 

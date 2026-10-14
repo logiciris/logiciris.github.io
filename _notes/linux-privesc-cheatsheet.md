@@ -80,7 +80,7 @@ echo 'cp /bin/bash /tmp/rootbash; chmod +s /tmp/rootbash' >> /path/to/root_scrip
 
 ## 함께 보기
 
-- [리눅스 권한 상승(개념)](/notes/linux-privilege-escalation/)
+- [리눅스 권한 상승](/notes/linux-privilege-escalation/)
 - [모의침투 작전 흐름](/notes/penetration-testing-operation-flow/)
 
 ## 참고 자료

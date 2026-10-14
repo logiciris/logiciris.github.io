@@ -72,8 +72,8 @@ SELECT current_user; SELECT version();
 
 ## 함께 보기
 
-- [웹 열거·공략 치트시트](/notes/web-enum-exploit-cheatsheet/) (SQLi)
-- [피벗·터널링 치트시트](/notes/pivoting-tunneling-cheatsheet/)
+- [웹 열거·공략 도구 치트시트](/notes/web-enum-exploit-cheatsheet/) (SQLi)
+- [피벗·터널링 도구 치트시트](/notes/pivoting-tunneling-cheatsheet/)
 - [모의침투 작전 흐름](/notes/penetration-testing-operation-flow/)
 
 ## 참고 자료

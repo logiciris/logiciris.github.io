@@ -72,7 +72,7 @@ winrs -r:$TARGET -u:$USER -p:Password123 "whoami"
 
 - [모의침투 작전 흐름](/notes/penetration-testing-operation-flow/)
 - [Active Directory 공격 도구 치트시트](/notes/active-directory-cheatsheet/)
-- [셸·페이로드·파일전송 치트시트](/notes/shells-payloads-transfer-cheatsheet/)
+- [셸·페이로드·파일전송 도구 치트시트](/notes/shells-payloads-transfer-cheatsheet/)
 
 ## 참고 자료
 

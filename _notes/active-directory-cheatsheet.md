@@ -87,7 +87,7 @@ bloodhound-ce-python -c all -d corp.local -u $USER -p 'Password123' -ns $DC --zi
 ## 함께 보기
 
 - [모의침투 작전 흐름](/notes/penetration-testing-operation-flow/)
-- [자격증명 공격·크래킹 치트시트](/notes/password-credential-cheatsheet/)
+- [자격증명 공격·크래킹 도구 치트시트](/notes/password-credential-cheatsheet/)
 - [윈도우 권한 상승](/notes/windows-privilege-escalation/)
 
 ## 참고 자료

@@ -89,7 +89,7 @@ crunch 6 6 -t Pre%%% -o wordlist.txt
 ## 함께 보기
 
 - [모의침투 작전 흐름](/notes/penetration-testing-operation-flow/)
-- [Active Directory 도구 치트시트](/notes/active-directory-cheatsheet/)
+- [Active Directory 공격 도구 치트시트](/notes/active-directory-cheatsheet/)
 
 ## 참고 자료
 

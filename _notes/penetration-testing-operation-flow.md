@@ -1,5 +1,5 @@
 ---
-title: "모의침투 작전 흐름: 초기 침투부터 도메인까지 단계별 방법론"
+title: "모의침투 작전 흐름"
 date: 2026-10-17 09:00:00 +0900
 categories: [Penetration Testing, Methodology]
 tags: [pentest, methodology, lateral-movement, privilege-escalation, active-directory, workflow]
@@ -86,7 +86,7 @@ flowchart LR
 | 개인키 | 대응 사용자/호스트 매핑, 패스프레이즈 오프라인 크래킹 |
 | 인증서 | 인증서 기반 인증, 발급 경로 악용 가능성 |
 
-> 판단 포인트: 새 비밀번호 하나가 과거에 막힌 SMB·WinRM·DB·SSH를 **한꺼번에** 열 수 있습니다. 그래서 자격증명을 얻으면 공격 매트릭스를 통째로 다시 돌립니다([재열거](/notes/network-service-enumeration/)).
+> 판단 포인트: 새 비밀번호 하나가 과거에 막힌 SMB·WinRM·DB·SSH를 **한꺼번에** 열 수 있습니다. 그래서 자격증명을 얻으면 공격 매트릭스를 통째로 다시 돌립니다(재열거).
 
 ### 4단계 — 권한 상승 (상승이 안 될 때 순서)
 
@@ -137,6 +137,7 @@ flowchart LR
 ## 함께 보기
 
 - [모의해킹 수명주기와 방법론](/notes/penetration-testing-lifecycle/)
+- [네트워크 서비스 열거 (FTP·SSH·SMB·SMTP)](/notes/network-service-enumeration/)
 - [정찰·스캐닝 도구 치트시트](/notes/recon-scanning-cheatsheet/)
 - [리눅스 권한 상승](/notes/linux-privilege-escalation/) · [윈도우 권한 상승](/notes/windows-privilege-escalation/)
 - [피벗팅과 터널링](/notes/pivoting-and-tunneling/)
