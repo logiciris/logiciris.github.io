@@ -1,207 +1,60 @@
 ---
-title: "Java 인젝션 시큐어코딩 체크리스트: SQL·명령·LDAP·XPath·로그·경로"
-date: 2026-10-16 11:30:00 +0900
+title: "Java 인젝션 (SQL·명령·LDAP·XPath·로그·경로)"
+date: 2026-10-15 09:00:00 +0900
 categories: [Secure Coding, Java]
-tags: [java, injection, secure-coding, code-review, checklist, cwe]
-description: "Java 코드 리뷰에서 SQL, OS 명령, LDAP, XPath, 로그, 경로 인젝션을 항목별 취약·안전 코드와 grep 포인트로 점검하는 표입니다."
+tags: [java, injection, secure-coding, code-review]
+description: "데이터가 질의·명령·경로의 구조로 해석되는 Java 인젝션의 개념과, 유형별 grep 신호·주입 구문·안전 API를 코드 리뷰 관점으로 정리합니다."
 mermaid: true
 ---
 
-> 인젝션은 한 문장으로 요약됩니다. "데이터가 구조(질의·명령·경로)로 해석되는 지점"을 찾으면 됩니다.
+> 인젝션은 한 문장으로 요약된다. **"데이터가 구조(질의·명령·경로)로 해석되는 지점"** 을 찾으면 된다. 해결 원칙도 하나다 — 구조와 값을 분리하는 API를 쓰고, 분리가 안 되는 곳(정렬 컬럼·명령 이름)은 허용 목록으로 고른다.
 
-## 원리: 문자열 결합이 만나는 지점
+## 개념
 
-```mermaid
-flowchart LR
-    U["사용자 입력"] --> S["문자열 결합"]
-    S --> I["해석기"]
-    I --> X["입력이 구조로 해석됨"]
-    U --> P["바인딩·인자 분리"]
-    P --> I2["해석기"]
-    I2 --> Y["값으로만 취급"]
-```
-
-해결의 원칙은 모든 항목에서 같습니다. **구조와 값을 분리하는 API를 쓰고, 분리가 안 되는 곳(정렬 컬럼, 명령 이름 등)은 허용 목록으로 고르게 합니다.**
-
-## 항목별 점검표
-
-### SQL 인젝션 (CWE-89)
-
-취약:
+문자열 결합으로 입력이 해석기에 들어가면 값이 구조로 바뀐다. Java 코드 리뷰에서는 **위험 API 호출의 인자가 상수인지, 외부 입력이 섞이는지**를 역추적하는 것이 핵심이다.
 
 ```java
-String sql = "SELECT * FROM users WHERE name = '" + name + "'";
-ResultSet rs = conn.createStatement().executeQuery(sql);
+String sql = "SELECT * FROM users WHERE name = '" + name + "'";   // 결합 = SQLi
+Runtime.getRuntime().exec(new String[]{"sh","-c","ping -c 1 "+host}); // 셸 결합 = 명령주입
+new File("/srv/files/" + request.getParameter("name"));            // 경로 결합 = 경로조작
 ```
 
-안전:
+`PreparedStatement`를 써도 `prepareStatement("..."+input)`처럼 **미리 결합한 문자열**을 넘기면 소용없다 — 클래스가 아니라 SQL 문자열이 상수인지 본다. MyBatis는 `#{}`는 안전, `${}`는 결합이다.
 
-```java
-String sql = "SELECT * FROM users WHERE name = ?";
-try (PreparedStatement ps = conn.prepareStatement(sql)) {
-    ps.setString(1, name);
-    ResultSet rs = ps.executeQuery();
-}
+## 공격·우회 구문
+
+grep으로 위험 지점을 모으고, 허가된 테스트 서버에서 입력을 바꿔 동작 변화를 본다.
+
+### 유형별 grep 신호 → 주입 입력
+
+```
+SQL (CWE-89):   createStatement / executeQuery("..."+ / MyBatis ${}
+  입력: name=x' OR '1'='1   /  정렬 자리: ?sort=(select...) → 식별자는 허용목록만
+OS 명령 (CWE-78):  Runtime.exec(String) / "sh","-c" / ProcessBuilder
+  입력: host=x; id   /  host=$(id)   /  host=-oProxyCommand=... (옵션 주입: 값이 -로 시작)
+LDAP (CWE-90):  DirContext.search( 에 필터 문자열 결합
+  입력: uid=*)(uid=*))(|(uid=*   /  uid=*)(objectClass=*
+XPath (CWE-643): xpath.evaluate("..."+ / compile 결합
+  입력: name=' or '1'='1   /  name=']|//user/*|a['
+로그 (CWE-117): log.info("..."+getParameter/getHeader)
+  입력: username=admin\r\n  INFO  fake log line   (로그 위조)
+경로 (CWE-22):  new File(base+input) / Paths.get(base+input)
+  입력: name=../../../etc/passwd   /  name=....//....//   (삭제형 치환 재조합)
 ```
 
-- 확인(grep): `createStatement`, `executeQuery(` 인자에 `+` 또는 `String.format`, MyBatis의 `${`.
-- 정렬 컬럼·테이블명은 바인딩할 수 없으므로 허용 목록 맵으로 변환합니다.
+### 안전 API 대조 (리뷰 기준)
 
-> **실무 포인트** `PreparedStatement`를 쓰고도 `prepareStatement("... " + input)`처럼 **미리 결합한 문자열**을 넘기면 소용이 없습니다. 클래스 이름이 아니라 SQL 문자열이 상수인지 보십시오. MyBatis에서는 `#{}`는 안전하고 `${}`는 결합이라는 점도 많이 놓칩니다.
-
-### OS 명령 인젝션 (CWE-78)
-
-취약:
-
-```java
-// 셸이 명령줄 전체를 해석하도록 sh -c에 결합 문자열을 넘기는 형태
-Runtime.getRuntime().exec(new String[]{"sh", "-c", "ping -c 1 " + host});   // host = "x; id" 이면 id도 실행
 ```
-
-안전:
-
-```java
-// 첫 글자는 영숫자만: "-h" 같은 옵션형 값 차단
-if (!host.matches("[A-Za-z0-9][A-Za-z0-9.-]{0,252}")) throw new IllegalArgumentException();
-ProcessBuilder pb = new ProcessBuilder("ping", "-c", "1", host);   // 셸 없이 인자를 분리 (`--`는 명령이 지원할 때만)
-pb.redirectErrorStream(true);
-Process p = pb.start();
+SQL   → PreparedStatement + setString / MyBatis #{}
+명령  → ProcessBuilder 인자 분리(shell 미사용), 값 첫 글자 영숫자 제한
+LDAP  → search(name, "(uid={0})", new Object[]{uid}, ...) + bind 인증
+XPath → setXPathVariableResolver + $변수
+로그  → CR/LF 치환 + 구조적 로깅 {}
+경로  → normalize() 후 기준 디렉터리 startsWith 검사(+ toRealPath 링크)
 ```
-
-- 확인(grep): `Runtime.getRuntime().exec`, `ProcessBuilder`, `"sh"`, `"cmd"`, `"-c"`.
-- 인자 분리만으로 끝나지 않습니다. 값이 `-`로 시작해 옵션처럼 해석되는 경우(옵션 주입)를 막기 위해 첫 글자를 영숫자로 제한하고, 옵션 끝을 뜻하는 `--`를 값 앞에 두는 방법도 있습니다. 다만 `--` 지원 여부는 명령마다 달라서 대상 명령의 문서로 확인해야 합니다. 가능하면 외부 명령 대신 Java API를 씁니다.
-
-### LDAP 인젝션 (CWE-90)
-
-취약:
-
-```java
-String filter = "(&(uid=" + uid + ")(userPassword=" + pw + "))";
-ctx.search("ou=people,dc=example,dc=com", filter, controls);
-```
-
-안전:
-
-```java
-String filter = "(&(uid={0})(objectClass=person))";
-ctx.search("ou=people,dc=example,dc=com", filter, new Object[]{ uid }, controls);
-```
-
-- `search(name, filterExpr, filterArgs, cons)` 형태는 인자를 이스케이프해 줍니다. 비밀번호 비교는 필터가 아니라 **bind 인증**으로 합니다.
-- 확인(grep): `DirContext`, `.search(` 인자에 문자열 결합. DN을 만드는 부분은 별도로 DN 이스케이프가 필요합니다.
-
-### XPath 인젝션 (CWE-643)
-
-취약:
-
-```java
-String expr = "//user[name='" + name + "' and pw='" + pw + "']";
-Node n = (Node) xpath.evaluate(expr, doc, XPathConstants.NODE);
-```
-
-안전:
-
-```java
-XPath xp = XPathFactory.newInstance().newXPath();
-xp.setXPathVariableResolver(v -> "n".equals(v.getLocalPart()) ? name : null);
-Node n = (Node) xp.evaluate("//user[name=$n]", doc, XPathConstants.NODE);
-```
-
-- 확인(grep): `XPathFactory`, `xpath.evaluate(`, `compile(`의 문자열 결합.
-- XPath는 주석·이스케이프 규칙이 약해 문자열 치환 방어가 깨지기 쉽습니다. 변수 바인딩을 씁니다.
-
-### 로그 인젝션 (CWE-117)
-
-취약:
-
-```java
-log.info("login failed for " + username);   // username에 줄바꿈이 포함될 수 있음
-```
-
-안전:
-
-```java
-String safe = username.replaceAll("[\\r\\n\\t]", "_");
-log.info("login failed for {}", safe);
-```
-
-- 확인(grep): 로그 호출 인자에 요청 파라미터·헤더가 그대로 들어가는지(`getParameter`, `getHeader`).
-- 줄 단위 로그라면 CR/LF 치환, JSON 로그라면 로거의 구조적 필드를 사용합니다. 로그 뷰어가 HTML이면 출력 시 이스케이프도 필요합니다.
-
-### 경로 조작 (CWE-22)
-
-취약:
-
-```java
-File f = new File("/srv/files/" + request.getParameter("name"));
-```
-
-안전:
-
-```java
-Path base = Paths.get("/srv/files").toRealPath();
-Path target = base.resolve(name).normalize().toRealPath();   // 존재하는 파일 전제 (링크 해석)
-if (!target.startsWith(base)) throw new SecurityException("invalid path");
-```
-
-- 확인(grep): `new File(`, `Paths.get(`, `FileInputStream(` 인자에 요청 값이 결합.
-- 정규화(`normalize`) 후 **기준 디렉터리 안에 있는지** 검사합니다. 심볼릭 링크까지 막으려면 target도 `toRealPath()`로 실제 경로를 구해 비교해야 하는데, 이는 파일이 **이미 존재할 때만** 동작합니다(없으면 예외). 업로드처럼 새 파일을 만드는 경우에는 부모 디렉터리를 `toRealPath()`로 확인하고, `normalize()`만으로는 심볼릭 링크를 따라가는 우회를 막지 못한다는 한계를 기억하십시오.
-
-> **실무 포인트** `..` 문자열을 지우는 `replace("../", "")`식 방어는 `....//` 같은 입력에서 다시 `../`가 만들어집니다. 문자열을 지우지 말고 **정규화 후 경계 검사**를 하십시오.
-
-## 한눈에 보는 표
-
-| 유형 | 위험 API 신호 | 안전한 방식 | 확인 포인트 |
-|---|---|---|---|
-| SQL | <code>createStatement</code>, <code>+</code>, <code>${}</code> | <code>PreparedStatement</code>, <code>#{}</code> | SQL 문자열이 상수인가 |
-| OS 명령 | <code>exec(String)</code>, <code>sh -c</code> | <code>ProcessBuilder</code> 인자 분리 | 옵션처럼 해석되는 값 |
-| LDAP | 필터 문자열 결합 | <code>{0}</code> 인자 필터, bind 인증 | DN·필터 모두 확인 |
-| XPath | <code>evaluate</code>에 결합 | 변수 리졸버 | 인증 로직에 쓰이는가 |
-| 로그 | 파라미터 직접 출력 | 치환·구조적 로깅 | 줄바꿈 포함 여부 |
-| 경로 | <code>new File(base + input)</code> | 정규화 후 경계 검사 | 업로드·다운로드 모두 |
-
-## 확인 방법(리뷰 순서)
-
-1. 위 표의 위험 API를 저장소 전체에서 grep으로 모읍니다.
-2. 각 호출에서 인자가 **상수인지, 외부 입력이 섞이는지** 역추적합니다.
-3. 입력이 섞이면 바인딩·분리·허용 목록 중 무엇으로 막고 있는지 확인합니다.
-4. 허가된 환경의 테스트 서버에서 따옴표, 줄바꿈, `..` 입력으로 동작이 달라지는지 확인합니다.
-5. 발견 항목마다 CWE 번호와 수정 예시를 함께 적어 개발팀에 전달합니다.
-
-## 대응 방안
-
-### 코드 수준
-
-- 질의·명령·경로 API는 값 바인딩 방식만 사용하고, 결합 코드는 리뷰에서 거절합니다.
-- 바인딩이 불가능한 요소(정렬 컬럼, 명령 이름, 파일 종류)는 허용 목록으로 변환합니다.
-- 입력 검증은 보조 수단입니다. 1차 방어는 항상 구조 분리입니다.
-
-### 설정 수준
-
-- DB 계정은 최소 권한으로, LDAP 조회 계정은 읽기 전용으로 둡니다.
-- 서비스 계정에 셸 실행 권한과 파일 쓰기 범위를 제한합니다.
-
-### 구조 수준
-
-- 정적 분석(SAST) 규칙과 CI 단계의 grep 검사로 위험 패턴을 자동 차단합니다.
-- 공용 유틸(안전한 경로 해석, 명령 실행 래퍼)을 만들어 팀이 직접 API를 호출하지 않게 합니다.
-
-## 함께 보기
-
-- [SQL 인젝션](/notes/sql-injection/)
-- [OS 명령 인젝션](/notes/os-command-injection/)
-- [경로 조작](/notes/path-traversal/)
 
 ## 참고 자료
 
-- OWASP SQL Injection Prevention Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html>
-- OWASP LDAP Injection Prevention Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html>
-- OWASP Injection Prevention Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html>
-- OWASP Logging Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html>
-- Oracle Java ProcessBuilder API: <https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ProcessBuilder.html>
-- CWE-89: <https://cwe.mitre.org/data/definitions/89.html>
-- CWE-78: <https://cwe.mitre.org/data/definitions/78.html>
-- CWE-90: <https://cwe.mitre.org/data/definitions/90.html>
-- CWE-643: <https://cwe.mitre.org/data/definitions/643.html>
-- CWE-117: <https://cwe.mitre.org/data/definitions/117.html>
-- CWE-22: <https://cwe.mitre.org/data/definitions/22.html>
+- [OWASP Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html)
+- [OWASP LDAP Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html)
+- [CWE-89](https://cwe.mitre.org/data/definitions/89.html) · [CWE-78](https://cwe.mitre.org/data/definitions/78.html) · [CWE-90](https://cwe.mitre.org/data/definitions/90.html) · [CWE-643](https://cwe.mitre.org/data/definitions/643.html) · [CWE-117](https://cwe.mitre.org/data/definitions/117.html) · [CWE-22](https://cwe.mitre.org/data/definitions/22.html)
