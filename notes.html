@@ -1,0 +1,20 @@
+---
+layout: page
+title: Notes
+subtitle: 개념과 치트시트 — 짧고 정확한 참조용
+permalink: /notes/
+---
+{% assign areas = "Web Security|LLM Security|Mobile Security|Reversing" | split: "|" %}
+{% for area in areas %}
+{% assign items = site.notes | where_exp: "n", "n.categories.first == area" | sort: "date" | reverse %}
+{% if items.size > 0 %}
+<section class="year-group">
+  <h2 class="group-title">{{ area }}</h2>
+  <ul class="entry-list">
+    {% for n in items %}
+    <li><a href="{{ n.url | relative_url }}"><span class="entry-title">{{ n.title }}</span><span class="entry-date">{{ n.categories[1] }}</span></a></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endfor %}

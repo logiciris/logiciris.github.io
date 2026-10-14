@@ -1,0 +1,15 @@
+---
+layout: default
+body_class: is-home
+---
+<section class="hero">
+  <div class="hero-mark">{% include logo.html size=64 %}</div>
+  <h1 class="hero-title">{{ site.tagline }}</h1>
+  <p class="hero-sub">{{ content | strip }}</p>
+  <p class="hero-links">
+    <a href="{{ '/posts/' | relative_url }}">Posts</a>
+    <a href="{{ '/notes/' | relative_url }}">Notes</a>
+    <a href="{{ '/projects/' | relative_url }}">Projects</a>
+    <a href="https://github.com/{{ site.github_username }}" rel="noopener">GitHub</a>
+  </p>
+</section>

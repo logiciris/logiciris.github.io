@@ -1,0 +1,19 @@
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>&copy; {{ site.time | date: "%Y" }} logiciris</span>
+    <span class="footer-links">
+      <a href="https://github.com/{{ site.github_username }}" rel="noopener">GitHub</a>
+      <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
+      <a href="{{ '/tags/' | relative_url }}">Tags</a>
+    </span>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search-backdrop" data-search-close></div>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="검색">
+    <input type="search" class="search-input" placeholder="글·노트·태그 검색" autocomplete="off" spellcheck="false" aria-label="검색어">
+    <ul class="search-results" data-search-results></ul>
+    <p class="search-hint">Esc 닫기 · ↑↓ 이동 · Enter 열기</p>
+  </div>
+</div>
+<script src="{{ '/assets/js/site.js' | relative_url }}" data-search-index="{{ '/search.json' | relative_url }}" defer></script>

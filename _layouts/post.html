@@ -1,0 +1,32 @@
+---
+layout: default
+---
+<div class="post-wrap">
+  <article class="post">
+    <header class="post-head">
+      <p class="eyebrow">
+        <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y. %m. %d" }}</time>
+        <span aria-hidden="true">·</span>
+        {% if page.collection == 'notes' %}<a href="{{ '/notes/' | relative_url }}">Notes</a>{% if page.categories.first %} / {{ page.categories.first }}{% endif %}{% else %}<a href="{{ '/posts/' | relative_url }}">Posts</a>{% endif %}
+      </p>
+      <h1 class="post-title">{{ page.title }}</h1>
+      {% if page.description %}<p class="post-desc">{{ page.description }}</p>{% endif %}
+    </header>
+    {% if page.toc %}<details class="toc-inline" data-toc-inline hidden><summary>목차</summary><nav aria-label="목차"></nav></details>{% endif %}
+    <div class="prose" data-prose>
+      {{ content }}
+    </div>
+    {% if page.tags.size > 0 %}
+    <footer class="post-foot">
+      <ul class="tag-list">
+        {% for t in page.tags %}<li><a href="{{ '/tags/' | relative_url }}#{{ t | slugify }}">#{{ t }}</a></li>{% endfor %}
+      </ul>
+    </footer>
+    {% endif %}
+  </article>
+  {% if page.toc %}<aside class="toc-side" data-toc-side hidden aria-label="목차"><p class="toc-title">목차</p><nav></nav></aside>{% endif %}
+</div>
+{% if page.mermaid %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.min.js" defer></script>
+<script src="{{ '/assets/js/mermaid-init.js' | relative_url }}" defer></script>
+{% endif %}

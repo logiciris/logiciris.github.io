@@ -1,0 +1,17 @@
+---
+layout: page
+title: Posts
+subtitle: 연구와 개발 기록
+permalink: /posts/
+---
+{% assign groups = site.posts | group_by_exp: "p", "p.date | date: '%Y'" %}
+{% for g in groups %}
+<section class="year-group">
+  <h2 class="group-title">{{ g.name }}</h2>
+  <ul class="entry-list">
+    {% for p in g.items %}
+    <li><a href="{{ p.url | relative_url }}"><span class="entry-title">{{ p.title }}</span><time class="entry-date" datetime="{{ p.date | date_to_xmlschema }}">{{ p.date | date: "%m. %d" }}</time></a></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endfor %}

@@ -1,0 +1,19 @@
+---
+layout: page
+title: Tags
+permalink: /tags/
+---
+{% assign all = site.posts | concat: site.notes | sort: "date" | reverse %}
+{% assign tags = all | map: "tags" | join: "," | split: "," | uniq | sort %}
+<p class="tag-cloud">
+  {% for t in tags %}{% assign c = all | where_exp: "d", "d.tags contains t" %}<a class="tag-chip" href="#{{ t | slugify }}">#{{ t }} <span>{{ c.size }}</span></a>{% endfor %}
+</p>
+{% for t in tags %}
+{% assign c = all | where_exp: "d", "d.tags contains t" %}
+<section class="year-group" id="{{ t | slugify }}">
+  <h2 class="group-title">#{{ t }}</h2>
+  <ul class="entry-list">
+    {% for d in c %}<li><a href="{{ d.url | relative_url }}"><span class="entry-title">{{ d.title }}</span><span class="entry-date">{% if d.collection == 'notes' %}Notes{% else %}Posts{% endif %}</span></a></li>{% endfor %}
+  </ul>
+</section>
+{% endfor %}

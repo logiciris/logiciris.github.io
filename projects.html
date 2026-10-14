@@ -1,0 +1,18 @@
+---
+layout: page
+title: Projects
+subtitle: 직접 만들고 정리하는 것들
+permalink: /projects/
+---
+<ul class="card-grid">
+  {% for p in site.data.projects %}
+  <li class="card">
+    <a href="{{ p.url }}" rel="noopener">
+      <span class="card-icon">{% include logo.html size=22 %}</span>
+      <span class="card-name">{{ p.name }}</span>
+      {% if p.description != "" %}<span class="card-desc">{{ p.description }}</span>{% endif %}
+      <span class="card-meta">{% if p.language != "" %}<span class="badge">{{ p.language }}</span>{% endif %}<span class="card-host">github.com</span></span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>

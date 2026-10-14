@@ -1,7 +1,6 @@
 ---
-layout: page
-title: logiciris blog
+layout: home
+title: logiciris
 permalink: /
 ---
-
-👋 안녕하세요. logiciris입니다.
+logiciris — 논리로 시스템을 읽고, 취약점을 봅니다.
