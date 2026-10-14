@@ -15,24 +15,24 @@ mermaid: true
 - 비밀번호 재설정 링크, 리다이렉트에 `Host` 값을 쓰는 분
 - 프록시·로드밸런서 뒤 구성을 진단하는 분
 
-## 1. 원리: 헤더는 전달 경로의 누구나 쓸 수 있다
+## 원리: 헤더는 전달 경로의 누구나 쓸 수 있다
 
 `X-Forwarded-For`(원래 클라이언트 IP), `X-Forwarded-Host`, `X-Real-IP`, `Host`는 **그냥 HTTP 헤더**입니다. 프록시가 덮어쓰거나 정리하지 않으면 클라이언트가 보낸 값이 그대로 앱에 도착합니다. 프록시가 값을 **덧붙이는** 구성에서는 앞쪽 항목이 클라이언트가 넣은 값입니다.
 
 ```mermaid
 flowchart LR
-    C["클라이언트"] -->|"X-Forwarded-For 위조값 포함"| P["리버스 프록시"]
-    P -->|"헤더 그대로 또는 덧붙여 전달"| A["애플리케이션"]
+    C["클라이언트"] -->|"위조 헤더 포함"| P["리버스 프록시"]
+    P -->|"헤더 전달"| A["애플리케이션"]
     A --> D{"헤더의 IP를 신뢰?"}
-    D -->|"예"| X["내부 IP로 오인해 접근 허용"]
-    D -->|"아니오, 프록시가 정한 값만"| S["실제 소켓 IP로 판단"]
+    D -->|"예"| X["내부 IP로 오인"]
+    D -->|"아니오"| S["소켓 IP로 판단"]
 ```
 
 영향은 크게 두 가지입니다.
 - **IP 기반 접근 제어 우회**: 관리 기능, 레이트 리밋, 로그인 시도 제한이 위조된 IP로 무력화됩니다.
 - **Host 값 오용**: 재설정 메일 링크나 리다이렉트가 공격자가 지정한 도메인을 가리키게 됩니다.
 
-## 2. 취약한 코드 → 고친 코드
+## 취약한 코드 → 고친 코드
 
 ```python
 # vulnerable.py
@@ -70,6 +70,8 @@ INTERNAL_NET = ipaddress.ip_network("203.0.113.0/24")
 
 @app.get("/admin")
 def admin():
+    if request.remote_addr is None:                 # 소켓 주소가 없는 환경(테스트 클라이언트, 일부 소켓)
+        abort(403)
     ip = ipaddress.ip_address(request.remote_addr)  # ProxyFix가 정리한 값
     if ip not in INTERNAL_NET:
         abort(403)
@@ -82,9 +84,10 @@ def reset():
 ```
 
 - 문자열 `startswith`로 IP를 비교하지 않고 네트워크 객체로 비교합니다.
+- `X-Forwarded-For`는 오른쪽부터 신뢰 프록시 수만큼 제거하고 남은 맨 오른쪽 값을 씁니다. 예: `203.0.113.9, 198.51.100.4`에서 신뢰 프록시가 1개면 프록시가 본 접속 주소인 `198.51.100.4`가 클라이언트이고, 왼쪽 `203.0.113.9`는 클라이언트가 임의로 써 넣은 값이라 믿지 않습니다(`x_for=1`이 이 계산).
 - 프록시가 `X-Forwarded-For`를 **덮어쓰도록** 설정하고, 앱은 그 값만 신뢰합니다.
 
-## 3. 확인 방법(진단 순서)
+## 확인 방법(진단 순서)
 
 1. **구조 파악**: 응답 헤더와 오류 페이지로 앞단에 프록시·CDN·로드밸런서가 있는지 추정합니다.
 2. **IP 기반 기능 찾기**: 관리 화면, 제한 구역 전용 기능, 로그인 시도 제한, "내 IP 표시" 기능을 찾습니다.
@@ -98,7 +101,7 @@ def reset():
 
 > **실무 포인트** 비밀번호 재설정 메일은 영향이 분명해서 보고 가치가 높습니다. 다만 Host를 바꾼 요청이 **피해자 계정으로 메일을 발송**시키는 시험은 허가 범위를 확인하고, 본인 테스트 계정으로만 확인하세요.
 
-## 4. 유형·변형
+## 유형·변형
 
 | 유형 | 원리 | 확인 포인트 |
 |---|---|---|
@@ -109,7 +112,7 @@ def reset():
 | 헤더 변형 | `X-Real-IP`, `Forwarded`(RFC 7239) 등 다른 헤더도 읽음 | 앱이 읽는 헤더 목록이 최소인가 |
 | 프록시 우회 | 앱이 프록시를 거치지 않고도 접근 가능 | 앱 포트가 프록시에서만 열려 있는가 |
 
-## 5. 대응 방안
+## 대응 방안
 
 ### 코드 수준
 - 프록시 헤더는 **신뢰 프록시 수를 지정한 미들웨어**(ProxyFix, Express의 `trust proxy` 등)로만 해석합니다. 직접 파싱하지 않습니다.
@@ -123,7 +126,7 @@ def reset():
 ### 구조 수준
 - 관리 기능은 IP 조건에만 기대지 않고 **인증·인가**를 별도로 요구합니다. IP 제한은 보조 수단입니다.
 
-## 6. 점검 체크리스트
+## 점검 체크리스트
 
 - [ ] 앞단 프록시 구성(몇 단계인지)을 문서로 확인했는가
 - [ ] 프록시가 클라이언트가 보낸 `X-Forwarded-*`를 덮어쓰거나 제거하는가
@@ -132,13 +135,13 @@ def reset():
 - [ ] 재설정 링크·리다이렉트가 요청의 `Host`가 아닌 설정값을 쓰는가
 - [ ] 앱 포트가 프록시를 거치지 않고 직접 노출되지 않는가
 
-## 7. 함께 보기
+## 함께 보기
 
 - [깨진 접근 제어와 IDOR](/notes/broken-access-control-idor/)
 - [인증 취약점](/notes/authentication-vulnerabilities/)
 - [HTTP 요청 스머글링](/notes/http-request-smuggling/)
 
-## 8. 참고 자료
+## 참고 자료
 
 - [RFC 7239: Forwarded HTTP Extension](https://www.rfc-editor.org/rfc/rfc7239)
 - [OWASP WSTG: Testing for Host Header Injection](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/17-Testing_for_Host_Header_Injection)

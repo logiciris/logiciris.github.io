@@ -45,6 +45,7 @@ from flask import Flask, request, jsonify
 import markdown
 
 app = Flask(__name__)
+# llm: 모델 호출 클라이언트, db: DB 연결 객체 (예제에서는 생략한 가상 객체)
 
 @app.post("/chat")
 def chat():
@@ -68,18 +69,23 @@ def search():
 
 ```python
 # safer_chat.py (가상 예제)
-import bleach, markdown
+import markdown
+import nh3                       # bleach는 2023년 deprecated, 유지보수되는 nh3 사용
+from flask import Flask, request, jsonify
 
-ALLOWED_TAGS = ["p", "ul", "ol", "li", "strong", "em", "code", "pre", "a"]
-ALLOWED_ATTRS = {"a": ["href"]}
+app = Flask(__name__)
+# llm, db는 앞 예제와 같은 가상 객체
+
+ALLOWED_TAGS = {"p", "ul", "ol", "li", "strong", "em", "code", "pre", "a"}
+ALLOWED_ATTRS = {"a": {"href"}}
 SORT_ALLOWED = {"price": "price", "name": "name", "rating": "rating"}
 
 @app.post("/chat")
 def chat():
     answer = llm.complete(request.json["message"])
     html = markdown.markdown(answer)
-    clean = bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS,
-                         protocols=["https"], strip=True)    # 허용 목록 기반 정화
+    clean = nh3.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS,
+                      url_schemes={"https"})                  # 허용 목록 기반 정화
     return jsonify({"html": clean})
 
 @app.post("/search")
@@ -90,7 +96,7 @@ def search():
     return jsonify(rows)
 ```
 
-프런트엔드에서도 가능하면 `innerHTML` 대신 `textContent`로 넣습니다. 마크다운 렌더링이 꼭 필요하면 서버에서 정화한 결과만 쓰고, 기본 CSP를 함께 둡니다.
+`bleach`를 쓰는 기존 코드도 많지만 2023년에 deprecated 되었으므로 새 코드는 `nh3`(Rust 기반 ammonia 바인딩)를, 브라우저 쪽 정화는 DOMPurify 같은 검증된 라이브러리를 고려하세요. 프런트엔드에서도 가능하면 `innerHTML` 대신 `textContent`로 넣습니다. 마크다운 렌더링이 꼭 필요하면 서버에서 정화한 결과만 쓰고, 기본 CSP를 함께 둡니다.
 
 > **실무 포인트** 값(value)은 바인딩으로 해결되지만, 컬럼명·정렬 방향 같은 **식별자**는 바인딩이 안 됩니다. 모델이 고르는 값이 식별자 자리에 들어간다면 허용 목록 매핑이 유일한 답입니다.
 

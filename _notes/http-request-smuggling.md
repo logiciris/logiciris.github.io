@@ -32,13 +32,13 @@ sequenceDiagram
     participant P as 프론트 프록시
     participant B as 백엔드
     participant V as 다른 사용자
-    A->>P: 요청 1개 (CL 기준으로 전체를 한 요청으로 봄)
-    P->>B: 같은 연결로 그대로 전달
-    Note over B: TE 기준으로 앞부분만 한 요청으로 끝내고<br/>나머지 바이트를 "다음 요청의 시작"으로 대기
+    A->>P: 요청 1개
+    P->>B: 그대로 전달
+    Note over B: 나머지를 다음 요청으로 대기
     V->>P: 정상 요청
-    P->>B: 같은 연결로 전달
-    Note over B: 대기 중이던 공격자 바이트 + 사용자 요청이 합쳐짐
-    B-->>V: 의도하지 않은 응답
+    P->>B: 전달
+    Note over B: 공격자 바이트와 결합
+    B-->>V: 엉뚱한 응답
 ```
 
 핵심 조건은 두 가지입니다.

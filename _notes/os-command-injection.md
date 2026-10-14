@@ -22,9 +22,9 @@ mermaid: true
 
 ```mermaid
 flowchart LR
-    A["사용자 입력<br/>host=127.0.0.1 ; id"] --> B["앱: 문자열 조립<br/>ping -c1 과 host를 이어 붙임"]
-    B --> C["셸 /bin/sh -c"]
-    C --> D["ping -c1 127.0.0.1"]
+    A["사용자 입력<br/>host 값"] --> B["앱: 문자열 조립"]
+    B --> C["셸 실행"]
+    C --> D["ping 실행"]
     C --> E["id 실행"]
     D --> F["결과 반환"]
     E --> F

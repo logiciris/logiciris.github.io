@@ -26,9 +26,9 @@ sequenceDiagram
     participant T as 도구 서버
     participant D as DB
     U->>L: 자연어 요청
-    L->>T: get_order(order_id, user_id)
-    Note over L,T: 두 값 모두 모델이 생성
-    T->>D: 받은 값 그대로 조회
+    L->>T: 주문 조회 호출
+    Note over L,T: 값은 모델이 생성
+    T->>D: 값 그대로 조회
     D-->>T: 결과
     T-->>L: 응답
     L-->>U: 요약

@@ -39,10 +39,10 @@ sequenceDiagram
     participant C as 클라이언트
     participant S as 서버
     C->>S: 로그인
-    S-->>C: JWT 발급 (비밀/개인 키로 서명)
-    C->>S: API 요청 + JWT
-    Note over S: 1) 헤더의 alg 확인<br/>2) 키로 서명 검증<br/>3) exp, aud 등 클레임 검증
-    S-->>C: 검증 통과 시 응답
+    S-->>C: JWT 발급
+    C->>S: API+JWT
+    Note over S: alg·서명·클레임 검증
+    S-->>C: 응답
 ```
 
 취약점은 대부분 2) 단계에서 **헤더의 값(`alg`)을 신뢰**하거나, **키가 약할 때** 생깁니다.
@@ -101,9 +101,9 @@ def current_user(token: str):
 
 ```mermaid
 flowchart LR
-    A["공격자"] -->|"공개 키를 HMAC 키로 사용해 서명<br/>alg=HS256"| T["위조 토큰"]
-    T --> S{"서버: alg를 헤더에서 읽음"}
-    S -->|"HS256 + 공개 키로 검증"| OK["통과: 관리자 클레임 인정"]
+    A["공격자"] -->|"공개 키로<br/>HS256 서명"| T["위조 토큰"]
+    T --> S{"alg를 신뢰?"}
+    S -->|"공개 키로 검증"| OK["관리자 인정"]
 ```
 
 ### 3-3. 약한 HMAC 키

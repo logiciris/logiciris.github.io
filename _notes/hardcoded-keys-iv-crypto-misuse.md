@@ -81,6 +81,8 @@ def decrypt(blob: bytes, aad: bytes = b"") -> bytes:
 
 핵심은 세 가지입니다. 키는 코드 밖에서 오고, nonce는 매번 난수이며, **인증된 암호화(AEAD)** 모드가 암호문 변조를 탐지합니다. `aad`에는 레코드 ID 같은 문맥을 넣어 다른 레코드로 암호문을 바꿔치기하는 것을 막을 수 있습니다.
 
+> **실무 포인트** AES-GCM은 같은 키에서 nonce가 한 번이라도 반복되면 기밀성과 무결성이 모두 무너집니다. 96비트 랜덤 nonce는 충돌 확률 때문에 한 키로 약 2^32회 이하만 암호화하도록 NIST SP 800-38D가 권고하므로, 대량 암호화에서는 이 횟수 전에 키를 교체(로테이션)하거나 카운터 기반 nonce를 쓰세요.
+
 > **실무 포인트** 키를 환경변수로 옮기는 것은 시작일 뿐입니다. 키가 유출됐을 때 **교체할 수 있는가**를 같이 설계해야 합니다. 암호문에 키 버전을 함께 저장해 두면 순환(rotation)이 가능해집니다.
 
 ## 4. 확인 방법(진단 순서)
@@ -140,6 +142,7 @@ def decrypt(blob: bytes, aad: bytes = b"") -> bytes:
 - [ ] 소스·바이너리·설정 샘플·이력에 키와 IV가 없다
 - [ ] 키는 외부 시크릿 저장소에서 주입되며 교체 절차가 있다
 - [ ] IV/nonce를 CSPRNG로 매번 새로 만든다
+- [ ] AES-GCM은 한 키당 랜덤 nonce 사용 횟수를 약 2^32회 이하로 제한하고 그 전에 키를 교체한다
 - [ ] ECB를 쓰지 않고 AEAD 모드를 사용한다
 - [ ] 비밀번호에서 키를 만들 때 KDF와 솔트를 쓴다
 - [ ] 용도별로 키가 분리돼 있고 버전이 기록된다
@@ -153,6 +156,7 @@ def decrypt(blob: bytes, aad: bytes = b"") -> bytes:
 
 ## 참고 자료
 
+- NIST SP 800-38D (GCM): <https://csrc.nist.gov/pubs/sp/800/38/d/final>
 - OWASP Cryptographic Storage Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html>
 - OWASP Secrets Management Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html>
 - CWE-798 Use of Hard-coded Credentials: <https://cwe.mitre.org/data/definitions/798.html>

@@ -21,14 +21,14 @@ mermaid: true
 
 ```mermaid
 sequenceDiagram
-    participant U as "로그인한 사용자"
-    participant E as "외부 사이트"
-    participant S as "대상 서비스"
+    participant U as "사용자"
+    participant E as "악성 사이트"
+    participant S as "서비스"
     U->>E: "페이지 방문"
-    E-->>U: "대상 서비스로 가는 자동 요청을 포함한 페이지"
-    U->>S: "요청 + 세션 쿠키 자동 첨부"
-    S->>S: "정상 사용자의 요청으로 처리"
-    S-->>U: "상태 변경 완료"
+    E-->>U: "숨은 요청 포함"
+    U->>S: "요청+쿠키 자동"
+    S->>S: "정상 요청 처리"
+    S-->>U: "변경 완료"
 ```
 
 공격자가 응답을 읽을 필요는 없습니다. **상태가 바뀌는 것**이 목적이기 때문입니다.
@@ -75,7 +75,7 @@ app = Flask(__name__)
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_SAMESITE="Lax",     # 크로스 사이트 POST에 쿠키 미첨부
+    SESSION_COOKIE_SAMESITE="Lax",     # 명시: 크로스 사이트 POST에 쿠키 미첨부
 )
 
 def csrf_token():
@@ -85,12 +85,14 @@ def csrf_token():
 
 @app.post("/transfer")                  # 상태 변경은 POST만
 def transfer():
-    sent = request.form.get("csrf", "")
-    if not hmac.compare_digest(sent, session.get("csrf", "")):
+    sent = request.form.get("csrf", "").encode()       # str에 비ASCII가 있으면 TypeError, bytes로 비교
+    if not hmac.compare_digest(sent, session.get("csrf", "").encode()):
         abort(403)                      # 서버에서 반드시 검증
     do_transfer(session["user"], request.form["to"], int(request.form["amount"]))
     return "ok"
 ```
+
+> **실무 포인트** SameSite를 지정하지 않으면 최신 Chromium 계열은 `Lax`로 취급하지만 브라우저와 버전마다 다르므로 **반드시 명시**하세요. 또 `Lax`는 링크 클릭 같은 최상위 `GET` 이동에는 쿠키를 보냅니다. 상태 변경을 `GET`으로 처리하면 `Lax`로도 막히지 않는다는 뜻이고, 이것이 "`GET`으로 상태를 바꾸지 않는다"의 근거입니다.
 
 > **실무 포인트** 토큰을 발급하는 코드는 있는데 **검증 코드가 없는** 경우를 자주 봅니다. 폼에 hidden 필드가 보인다고 안전하다고 판정하지 말고, 토큰을 지우거나 바꿔 보내서 서버가 거부하는지 꼭 확인하세요.
 

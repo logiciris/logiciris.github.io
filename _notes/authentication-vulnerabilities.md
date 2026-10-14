@@ -168,10 +168,10 @@ sequenceDiagram
     participant U as 사용자
     participant S as 서버
     participant M as 메일
-    U->>S: 재설정 요청(이메일)
-    S->>M: 링크 발송 (토큰 포함)
-    U->>S: 링크 접속 + 새 비밀번호
-    S->>S: 토큰 검증 → 변경
+    U->>S: 재설정 요청
+    S->>M: 링크 발송
+    U->>S: 링크+새 비번
+    S->>S: 토큰 검증
 ```
 
 | 취약점 | 원리 | 확인 포인트 |
