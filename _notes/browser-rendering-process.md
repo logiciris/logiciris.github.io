@@ -1,7 +1,7 @@
 ---
 title: "브라우저 렌더링 순서 (DOM · CSSOM · Render Tree)"
 date: 2026-10-15 09:00:00 +0900
-categories: [Web, Fundamentals]
+categories: [Web Fundamentals, Rendering]
 tags: [dom, cssom, render-tree, javascript, web]
 description: "브라우저가 HTML·CSS·JavaScript를 받아 화면에 그리기까지 — DOM/CSSOM 생성, 렌더 트리 결합, 레이아웃, 페인팅, JS 실행과 바이트→텍스트 디코딩 과정을 정리합니다."
 mermaid: true

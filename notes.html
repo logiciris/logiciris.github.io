@@ -4,7 +4,7 @@ title: Notes
 subtitle: 개념과 치트시트 — 짧고 정확한 참조용
 permalink: /notes/
 ---
-{% assign areas = "Web Security|LLM Security|Secure Coding|Crypto|Cloud Security|Mobile Security|Network|Reversing" | split: "|" %}
+{% assign areas = "Web Security|LLM Security|Secure Coding|Crypto|Cloud Security|Mobile Security|Network|Reversing|Web Fundamentals" | split: "|" %}
 {% for area in areas %}
 {% assign items = site.notes | where_exp: "n", "n.categories.first == area" | sort: "date" | reverse %}
 {% if items.size > 0 %}

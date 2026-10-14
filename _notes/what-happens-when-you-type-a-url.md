@@ -1,7 +1,7 @@
 ---
 title: "URL을 입력하면 서버까지 무슨 일이 벌어지나"
 date: 2026-10-15 09:00:00 +0900
-categories: [Web, Fundamentals]
+categories: [Web Fundamentals, Networking]
 tags: [dns, tcp, http, networking, web]
 description: "주소창에 URL을 입력하고 Enter를 누른 순간부터 DNS 조회·TCP 연결·HTTP 요청·서버 응답까지, 밀리초 사이에 일어나는 과정을 단계별로 정리합니다."
 mermaid: true
