@@ -9,6 +9,15 @@ mermaid: true
 
 > 주소창에 URL을 입력하고 Enter를 누르면, 화면에 페이지가 뜨기까지 DNS 조회 → TCP 연결 → HTTP 요청 → 서버 응답 → 렌더링이 순서대로 일어난다. 이 글은 그중 **렌더링 직전까지**를 다룬다.
 
+```mermaid
+flowchart LR
+    U["URL 입력<br/>+ Enter"] --> D["① DNS 조회<br/>도메인 → IP"]
+    D --> T["② TCP/TLS 연결"]
+    T --> Q["③ HTTP 요청"]
+    Q --> S["④ 서버 응답<br/>(상태 코드 + HTML)"]
+    S --> R["⑤ 렌더링"]
+```
+
 ## 1. DNS: 도메인을 IP로
 
 브라우저는 `www.mypage.com`의 IP 주소를 찾기 위해 먼저 **캐시를 순서대로** 확인한다.
@@ -21,6 +30,21 @@ mermaid: true
 캐시는 네트워크 트래픽을 줄이고 전송 시간을 개선하기 때문에 여러 계층에서 관리된다.
 
 캐시에 없으면 ISP의 DNS 서버(**DNS recursor**)가 IP를 찾기 위해 다른 DNS 서버들(**name server**)을 오가며 조회한다. 이렇게 서버에서 서버로 반복 조회하는 것을 **재귀적 검색(recursive search)** 이라 하고, 끝내 못 찾으면 에러를 반환한다.
+
+도메인은 오른쪽 끝(루트)부터 왼쪽으로 내려가는 **계층 구조**다. 각 계층마다 담당 name server가 따로 있다.
+
+```mermaid
+flowchart TB
+    Root["루트 (Root)"] --> com[".com"]
+    Root --> org[".org"]
+    Root --> net[".net"]
+    com --> mypage["mypage.com"]
+    com --> example["example.com"]
+    mypage --> www["www.mypage.com"]
+    mypage --> api["api.mypage.com"]
+```
+
+recursor는 이 계층을 위에서부터 따라 내려가며 담당 서버를 찾아간다.
 
 ```mermaid
 flowchart LR
@@ -65,6 +89,8 @@ IP를 알아낸 뒤 브라우저가 하는 일이다.
 
 ## 참고 자료
 
+- [What happens when you type an URL in the browser and press enter? (maneesa, Medium)](https://medium.com/@maneesa/what-happens-when-you-type-an-url-in-the-browser-and-press-enter-bb0aa2449c1a)
+- [브라우저에 URL을 입력하면 무슨 일이 일어날까? (devjin-blog)](https://devjin-blog.com/what-happen-browser-search/)
 - [MDN: What happens when you navigate to a website?](https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/Navigation_and_resource_timings)
 - [MDN: DNS](https://developer.mozilla.org/en-US/docs/Glossary/DNS)
 - [MDN: TCP handshake](https://developer.mozilla.org/en-US/docs/Glossary/TCP_handshake)
