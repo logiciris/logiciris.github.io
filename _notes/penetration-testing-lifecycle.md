@@ -55,6 +55,6 @@ flowchart LR
 
 ## 참고 자료
 
-- [PTES: Penetration Testing Execution Standard](http://www.pentest-standard.org/)
+- PTES: Penetration Testing Execution Standard (pentest-standard.org)
 - [MITRE ATT&CK](https://attack.mitre.org/)
 - [NIST SP 800-115: Technical Guide to Information Security Testing](https://csrc.nist.gov/pubs/sp/800/115/final)

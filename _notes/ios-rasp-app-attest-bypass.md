@@ -17,7 +17,7 @@ mermaid: true
 
 ## 공격·우회 구문
 
-허가된 대상에서만. 클래스명 해석은 [Frida 메서드 후킹](mobile-frida-method-hooking) 참고.
+허가된 대상에서만. 클래스명 해석은 [Frida 메서드 후킹](/notes/mobile-frida-method-hooking/) 참고.
 
 ### Attest/보호 결과 함수 재정의
 

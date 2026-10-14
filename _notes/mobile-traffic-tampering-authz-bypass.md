@@ -24,7 +24,7 @@ mermaid: true
 
 ## 공격·우회 구문
 
-허가된 대상에서만. 가로채기 환경은 [iOS 트래픽 가로채기](ios-traffic-interception-setup)·[SSL 피닝 우회](android-ssl-pinning-bypass) 참고.
+허가된 대상에서만. 가로채기 환경은 [iOS 트래픽 가로채기](/notes/ios-traffic-interception-setup/)·[SSL 피닝 우회](/notes/android-ssl-pinning-bypass/) 참고.
 
 ### 요청·응답 변조 (프록시)
 

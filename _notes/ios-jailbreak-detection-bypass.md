@@ -27,7 +27,7 @@ if UIApplication.shared.canOpenURL(URL(string:"cydia://package/x")!) { return tr
 
 ## 공격·우회 구문
 
-허가된 대상에서만. 클래스명 맹글링은 [Frida 메서드 후킹](mobile-frida-method-hooking) 참고.
+허가된 대상에서만. 클래스명 맹글링은 [Frida 메서드 후킹](/notes/mobile-frida-method-hooking/) 참고.
 
 ### 탐지 함수 반환 뒤집기 (Frida)
 
