@@ -9,13 +9,7 @@ mermaid: true
 
 > CSP는 XSS를 "없애는" 장치가 아니라, XSS가 생겨도 **스크립트가 실행되거나 데이터가 나가는 길을 좁히는** 2차 방어선입니다. 정책이 느슨하면 헤더만 있고 효과는 없습니다.
 
-## 이런 분께
-
-- 보안 헤더 점검에서 "CSP 설정 없음"만 보고하고 끝내던 분
-- CSP를 적용했는데 `unsafe-inline`을 넣어 두고 안심하는 분
-- CSP가 있는 사이트에서 XSS를 찾았을 때 어디까지 가능한지 판단해야 하는 분
-
-## 1. 원리: 브라우저가 "허용 목록"을 강제한다
+## 원리: 브라우저가 "허용 목록"을 강제한다
 
 서버가 `Content-Security-Policy` 응답 헤더로 정책을 내려 주면, 브라우저는 정책에 맞지 않는 리소스 로딩과 스크립트 실행을 차단합니다.
 
@@ -46,7 +40,7 @@ flowchart LR
 | `connect-src` | fetch/XHR 대상 | 데이터 유출 경로 |
 | `report-to` / `report-uri` | 위반 보고 | 적용 전 `Report-Only`로 시험 |
 
-## 2. 취약한 정책 → 고친 정책
+## 취약한 정책 → 고친 정책
 
 취약한 예시입니다.
 
@@ -87,7 +81,7 @@ def index():
 - `'strict-dynamic'`(CSP Level 3): nonce로 신뢰받은 스크립트가 **동적으로 추가하는 스크립트**도 신뢰합니다. 이때 host 기반 허용 목록은 무시되므로 도메인 목록 관리가 필요 없어집니다.
 - `object-src 'none'`, `base-uri 'none'`으로 흔한 우회 통로를 막습니다.
 
-## 3. 우회 패턴
+## 우회 패턴
 
 CSP가 있어도 정책이 약하면 실행이 가능합니다. 진단에서 실제로 보는 패턴입니다.
 
@@ -107,7 +101,7 @@ CSP가 있어도 정책이 약하면 실행이 가능합니다. 진단에서 실
 
 실무 판단 포인트입니다. 여기서 많이 놓칩니다. `script-src 'self'`는 안전해 보이지만, **같은 출처에 사용자가 파일을 올릴 수 있고 그 파일이 `text/javascript`로 서빙된다면** 그냥 우회됩니다. 또 `base-uri` 한 줄 빠진 것은 눈에 안 띄지만, nonce를 쓰는 사이트에서 상대 경로 스크립트가 있으면 이 한 줄이 우회의 열쇠가 됩니다.
 
-## 4. 확인 방법(진단 순서)
+## 확인 방법(진단 순서)
 
 1. **헤더 수집**: 주요 페이지의 `Content-Security-Policy`와 `Content-Security-Policy-Report-Only`를 모두 확인합니다. `Report-Only`는 **차단하지 않고 보고만** 하므로 실제 방어가 아닙니다.
 2. **평가 도구로 1차 점검**: 정책 문자열을 CSP 평가 도구(구글 CSP Evaluator 같은 공개 도구)에 넣어 `unsafe-*`, 와일드카드, 누락 디렉티브를 훑습니다.
@@ -118,7 +112,7 @@ CSP가 있어도 정책이 약하면 실행이 가능합니다. 진단에서 실
 5. **허용 도메인 조사**: `script-src`에 있는 도메인마다 JSONP 엔드포인트, 사용자 업로드 기능, 오래된 라이브러리가 있는지 확인합니다.
 6. **주입 지점과 결합**: XSS 주입 지점이 있으면 위 우회 패턴 중 맞는 것을 시도하되, 실제 영향은 무해한 증거(예: 문서 도메인 출력)로만 보여 줍니다.
 
-## 5. 대응 방안
+## 대응 방안
 
 ### 설정 수준
 - **nonce 또는 hash 기반 strict 정책**을 기본으로 합니다. host 허용 목록만으로 만든 정책은 우회가 쉬워 권장되지 않습니다.
@@ -136,17 +130,7 @@ CSP가 있어도 정책이 약하면 실행이 가능합니다. 진단에서 실
 - JSONP를 쓰는 외부 도메인은 허용 목록에서 제거합니다.
 - 서드파티 스크립트가 많다면 서브리소스 무결성(SRI)과 함께 최소한만 허용합니다.
 
-## 6. 점검 체크리스트
-
-- [ ] `Content-Security-Policy`가 `Report-Only`가 아닌 차단 모드로 적용되어 있는가
-- [ ] `script-src`에 `unsafe-inline`, `unsafe-eval`, `*`, `data:`가 없는가
-- [ ] nonce가 응답마다 바뀌고 예측 불가능한가
-- [ ] `object-src`, `base-uri`, `frame-ancestors`, `form-action`이 지정되어 있는가
-- [ ] 허용 도메인에 JSONP나 사용자 업로드 기능이 없는가
-- [ ] 위반 보고를 수집해 주기적으로 확인하는가
-- [ ] CSP와 별개로 출력 인코딩이 적용되어 있는가
-
-## 7. 참고 자료
+## 참고 자료
 
 - [W3C: Content Security Policy Level 3](https://www.w3.org/TR/CSP3/)
 - [MDN: Content-Security-Policy 헤더](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy)

@@ -130,3 +130,19 @@
     else if (e.key === 'Escape' && !root.hidden) { close(); }
   });
 })();
+
+(function () {
+  var root = document.documentElement;
+  function apply(t) {
+    if (t === 'light') root.setAttribute('data-theme', 'light');
+    else root.removeAttribute('data-theme');
+  }
+  function current() { return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+  document.querySelectorAll('[data-theme-toggle]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var next = current() === 'light' ? 'dark' : 'light';
+      apply(next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+  });
+})();

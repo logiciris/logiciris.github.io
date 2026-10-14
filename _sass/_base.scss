@@ -11,16 +11,15 @@
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   color-scheme: dark;
 }
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #fafaf8;
-    --bg-raised: #f0f0ec;
-    --fg: #151517;
-    --fg-dim: #55554f;
-    --line: #deded8;
-    --accent: #0f6e66;
-    color-scheme: light;
-  }
+:root[data-theme="light"] {
+  --bg: #fafaf8;
+  --bg-raised: #f0f0ec;
+  --fg: #151517;
+  --fg-dim: #55554f;
+  --line: #deded8;
+  --accent: #0f6e66;
+  --code-bg: #f0f0ec;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
@@ -185,3 +184,10 @@ pre, code, kbd, samp, .highlight, div.highlighter-rouge { word-break: normal; }
 .prose p, .prose li, .card-desc { text-wrap: pretty; }
 .prose pre code, .prose .highlight code { word-break: normal; }
 .prose, .entry-title, .card-name, .group-title, .toc-list a { overflow-wrap: break-word; }
+
+.theme-toggle { background: none; border: 0; color: var(--fg-dim); cursor: pointer; padding: 6px; display: inline-flex; border-radius: 6px; }
+.theme-toggle:hover { color: var(--accent); }
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: inline-flex; }
+:root[data-theme="light"] .theme-toggle .icon-sun { display: inline-flex; }
+:root[data-theme="light"] .theme-toggle .icon-moon { display: none; }
