@@ -26,8 +26,8 @@ mermaid: true
 ### 열거
 
 ```cmd
-whoami /all                              :: 사용자·그룹·권한
-systeminfo                               :: 패치 수준·OS 버전
+whoami /all  :: 사용자·그룹·권한
+systeminfo  :: 패치 수준·OS 버전
 ```
 ```powershell
 Get-LocalUser; Get-LocalGroupMember Administrators
@@ -39,9 +39,9 @@ Get-History; (Get-PSReadlineOption).HistorySavePath
 ### 서비스·경로 점검
 
 ```cmd
-sc qc <service>                          :: 서비스 바이너리 경로
-icacls "C:\path\to\service.exe"          :: 쓰기 권한 여부
-wmic service get name,pathname,startmode | findstr /i /v """"   :: 따옴표 없는 경로
+sc qc <service>  :: 서비스 바이너리 경로
+icacls "C:\path\to\service.exe"  :: 쓰기 권한 여부
+wmic service get name,pathname,startmode | findstr /i /v """"  :: 따옴표 없는 경로
 ```
 
 ### 자동화 열거

