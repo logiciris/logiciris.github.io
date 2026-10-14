@@ -3,7 +3,6 @@ title: "Prototype Pollution 취약점 분석"
 date: 2025-05-20
 categories: [Vuln Analysis]
 tags: [javascript, prototype pollution]
-layout: post
 description: "Object.prototype을 오염시켜 모든 객체에 악성 속성을 전파하는 Prototype Pollution 취약점의 원리와 취약 코드를 분석합니다."
 ---
 
