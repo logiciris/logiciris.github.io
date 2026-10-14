@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <style>.f{fill:#f2f2ef}.s{stroke:#f2f2ef}.a{stroke:#7fd1c7}@media (prefers-color-scheme:light){.f{fill:#111113}.s{stroke:#111113}.a{stroke:#2f8f84}}</style>
+  <g fill="none" stroke-width="4" stroke-linecap="round">
+    <path class="s" d="M6 32Q32 9 58 32Q32 55 6 32Z"/>
+    <circle class="a" cx="32" cy="32" r="10" stroke-width="3"/>
+  </g>
+  <polygon class="f" points="32,1 36,32 32,63 28,32"/>
+</svg>
