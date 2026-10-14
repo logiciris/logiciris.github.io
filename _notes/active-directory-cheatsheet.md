@@ -12,12 +12,8 @@ mermaid: true
 ## 개념
 
 ```mermaid
-flowchart TB
-  N[자격증명 없음] --> E1[익명 열거: 사용자명]
-  E1 --> U[도메인 사용자 확보]
-  U --> E2[LDAP·BloodHound 열거]
-  E2 --> P[공격 경로: Roast·ACL·PtH]
-  P --> A[로컬/도메인 관리자]
+flowchart LR
+  N[자격증명 없음] --> E1[사용자명 열거] --> U[도메인 사용자] --> E2[디렉터리 열거] --> P[공격 경로] --> A[관리자]
 ```
 
 핵심: **새 권한을 얻을 때마다 그래프를 다시 그립니다.** 어제 막힌 경로가 오늘 얻은 ACL·해시로 열립니다.
@@ -86,7 +82,7 @@ impacket-GetUserSPNs -request -dc-ip $DC corp.local/$USER -outputfile spn.hash
 bloodhound-ce-python -c all -d corp.local -u $USER -p 'Password123' -ns $DC --zip
 ```
 
-> 판단 포인트: BloodHound가 비어 보여도 포기하지 말고, 접근 가능한 마지막 호스트에서 수집기를 직접 돌리면 세션·로컬 관리자 관계가 추가로 잡힙니다. `GenericAll`·`WriteDACL`·`ForceChangePassword` edge가 보이면 그게 다음 한 수입니다.
+> 판단 포인트: BloodHound가 비어 보여도 포기하지 말고, 접근 가능한 마지막 호스트에서 수집기를 직접 돌리면 세션·로컬 관리자 관계가 추가로 잡힙니다. `GenericAll`·`WriteDACL`·`ForceChangePassword` edge가 보이면 그게 다음 공격 경로입니다.
 
 ## 함께 보기
 

