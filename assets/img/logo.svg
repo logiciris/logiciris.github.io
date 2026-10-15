@@ -1,9 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="logiciris">
   <style>.f{fill:#f2f2ef}.s{stroke:#f2f2ef}.a{stroke:#7fd1c7}@media (prefers-color-scheme:light){.f{fill:#111113}.s{stroke:#111113}.a{stroke:#2f8f84}}</style>
-  <g fill="none" stroke-width="1.6" stroke-linecap="round">
-    <path class="s" d="M10 32Q32 12 54 32Q32 52 10 32Z"/>
-    <path class="s" d="M1.5 32H8.5M55.5 32H62.5"/>
-    <circle class="a" cx="32" cy="32" r="9" stroke-width="1.1"/>
+  <g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <path class="s" d="M6 32Q32 9 58 32Q32 55 6 32Z"/>
+    <circle class="a" cx="32" cy="32" r="10" stroke-width="2.6"/>
   </g>
-  <polygon class="f" points="32,4 34.2,32 32,60 29.8,32"/>
+  <polygon class="f" points="32,1 36,32 32,63 28,32"/>
 </svg>
