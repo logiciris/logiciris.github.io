@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="logiciris">
-  <style>.s{stroke:#f2f2ef}.a{stroke:#7fd1c7}@media (prefers-color-scheme:light){.s{stroke:#111113}.a{stroke:#2f8f84}}</style>
+  <style>.s{stroke:#f2f2ef}.a{stroke:#7fd1c7}</style>
   <g fill="none" stroke-width="3.2" stroke-linejoin="miter" stroke-linecap="butt">
     <path class="s" d="M32 8L40 26L32 36L24 26Z"/>
     <path class="s" d="M32 36L14 30L18 46Z"/>

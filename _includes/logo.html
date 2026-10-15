@@ -1,1 +1,2 @@
-<img class="logo-mark" src="{{ '/assets/img/logo.svg' | relative_url }}" width="{{ include.size | default: 28 }}" height="{{ include.size | default: 28 }}" alt="" aria-hidden="true">
+{%- assign s = include.size | default: 28 -%}
+<svg class="logo-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="{{ s }}" height="{{ s }}" aria-hidden="true" focusable="false"><g fill="none" stroke-width="3.2" stroke-linejoin="miter"><path stroke="var(--fg)" d="M32 8L40 26L32 36L24 26Z"/><path stroke="var(--fg)" d="M32 36L14 30L18 46Z"/><path stroke="var(--fg)" d="M32 36L50 30L46 46Z"/><path stroke="var(--accent)" d="M32 36V58"/></g></svg>
