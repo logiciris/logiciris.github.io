@@ -18,7 +18,8 @@
   --fg-dim: #55554f;
   --line: #deded8;
   --accent: #0f6e66;
-  --code-bg: #f0f0ec;
+  /* 코드블록은 라이트/다크 모두 어두운 배경 유지(코드 글자색이 다크 고정이라 밝은 배경이면 안 보임). --code-bg는 코드·mermaid 블록에만 쓰임 */
+  --code-bg: #0d0d10;
   color-scheme: light;
 }
 
@@ -150,6 +151,8 @@ a:hover { color: var(--accent); }
 .prose pre code, .prose .highlight code { background: none; border: 0; padding: 0; overflow-wrap: normal; font-size: 13.5px; }
 div.highlighter-rouge { position: relative; margin: 0 0 24px; background: var(--code-bg); border: 1px solid #202024; border-radius: 10px; max-width: 100%; }
 div.highlighter-rouge .highlight, div.highlighter-rouge pre { margin: 0; background: transparent !important; }
+/* 공백 토큰(span.w)의 배경 제거 — 안 그러면 코드 줄 공백이 희미한 네모로 보임(라이트·다크 공통) */
+div.highlighter-rouge .highlight .w { background: transparent !important; }
 div.highlighter-rouge pre { overflow-x: auto; padding: 16px 18px; line-height: 1.65; color: #e6edf3; font-family: var(--mono); tab-size: 2; }
 /* Rouge 미지원 언어(cmd 등)는 하이라이트 래퍼 없이 맨 <pre>로 렌더됨 → 같은 박스 + 가로 스크롤로 통일(폰 넘침 방지) */
 .prose > pre:not(.mermaid) { margin: 0 0 24px; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: var(--code-bg); border: 1px solid #202024; border-radius: 10px; padding: 16px 18px; line-height: 1.65; color: #e6edf3; font-family: var(--mono); tab-size: 2; }
