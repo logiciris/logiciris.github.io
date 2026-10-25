@@ -35,6 +35,24 @@ sass:
   sass_dir: _sass
   style: compressed
 
+comments:
+  provider: giscus # empty = off. Per-page opt-out: `comments: false` in front matter
+  giscus:
+    repo: logiciris/logiciris.github.io
+    repo_id: MDEwOlJlcG9zaXRvcnkyMTIxMTU5MjE=
+    category: General
+    category_id: DIC_kwDODKSh0c4CqYR-
+    mapping: pathname
+    strict: 0
+    reactions_enabled: 1
+    input_position: bottom
+    lang: ko
+
+# Visitor analytics. Empty = off. Emitted only when jekyll.environment == production.
+analytics:
+  goatcounter: "" # GoatCounter site code (CODE in https://CODE.goatcounter.com)
+  google_analytics: "" # GA4 measurement id (G-XXXXXXXXXX)
+
 collections:
   notes:
     output: true

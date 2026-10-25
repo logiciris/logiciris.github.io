@@ -143,6 +143,8 @@
       var next = current() === 'light' ? 'dark' : 'light';
       apply(next);
       try { localStorage.setItem('theme', next); } catch (e) {}
+      var gc = document.querySelector('iframe.giscus-frame');
+      if (gc && gc.contentWindow) gc.contentWindow.postMessage({ giscus: { setConfig: { theme: next } } }, 'https://giscus.app');
     });
   });
 })();
