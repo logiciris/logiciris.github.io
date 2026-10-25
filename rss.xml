@@ -1,0 +1,28 @@
+---
+layout: null
+sitemap: false
+---
+<?xml version="1.0" encoding="UTF-8"?>
+{%- assign items = site.posts | concat: site.notes | sort: "date" | reverse -%}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ site.title | xml_escape }}</title>
+    <link>{{ site.url }}/</link>
+    <description>{{ site.description | xml_escape }}</description>
+    <language>ko-KR</language>
+    <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
+    <atom:link href="{{ site.url }}/rss.xml" rel="self" type="application/rss+xml" />
+    {%- for item in items limit: 50 %}
+    <item>
+      <title>{{ item.title | xml_escape }}</title>
+      <link>{{ item.url | absolute_url }}</link>
+      <guid isPermaLink="true">{{ item.url | absolute_url }}</guid>
+      <pubDate>{{ item.date | date_to_rfc822 }}</pubDate>
+      <description>{{ item.description | default: item.excerpt | strip_html | normalize_whitespace | truncate: 300 | xml_escape }}</description>
+      {%- for c in item.categories %}
+      <category>{{ c | xml_escape }}</category>
+      {%- endfor %}
+    </item>
+    {%- endfor %}
+  </channel>
+</rss>
